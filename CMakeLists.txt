@@ -38,5 +38,13 @@ add_executable(TestSparse "${CMAKE_SOURCE_DIR}/testing/test_sparseSet.cpp")
 target_link_libraries(TestSparse PUBLIC EngineSource)
 target_link_libraries(TestSparse PUBLIC catch)
 
+add_executable(TestParse "${CMAKE_SOURCE_DIR}/testing/test_parse.cpp")
+target_link_libraries(TestParse PUBLIC EngineSource)
+target_link_libraries(TestParse PUBLIC catch)
+
+add_executable(TestRessource "${CMAKE_SOURCE_DIR}/testing/test_ressources.cpp")
+target_link_libraries(TestRessource PUBLIC EngineSource)
+target_link_libraries(TestRessource PUBLIC catch)
+
 
 

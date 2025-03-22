@@ -2,6 +2,9 @@
 #include<iostream>
 
 namespace DATASTRUCT{
+
+
+	
 	template <typename T>
 	DynamicList<T>::DynamicList() : max_size(8), current_index(-1){
 		liste = (T*) ::operator new[](max_size * sizeof(T));

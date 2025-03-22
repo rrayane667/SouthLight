@@ -14,7 +14,7 @@ namespace RESSOURCES
     };
     struct MeshData : public Data{
         ~MeshData() override{
-            delete vertices, UV, normals;
+            delete vertices, UV, normals, faces;
         }
 
         MeshData* clone() const override;
@@ -25,5 +25,8 @@ namespace RESSOURCES
         List<MATH::vec3> *vertices;
         List<MATH::vec2> *UV;
         List<MATH::vec3> *normals;
+        List<paire<float, float>> *faces;
     };
+
+
 } 

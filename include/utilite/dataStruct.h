@@ -2,6 +2,7 @@
 #include <stdlib.h> 
 #include <iostream>
 #include <string>
+#include <tuple>
 namespace DATASTRUCT {
 
 	template <typename T>
@@ -42,6 +43,27 @@ namespace DATASTRUCT {
 		friend std::ostream& operator<<(std::ostream& o, const paire<T, U>& p) {
 			o << "(" << p.first << ", " << p.second << ")";
 			return o;
+		}
+	};
+
+	template <typename T>
+	class Trio : public std::tuple<T, T, T> {
+	public:
+
+		Trio(T x, T y, T z) : std::tuple<T, T, T>(x, y, z) {}
+	
+		friend std::ostream& operator<<(std::ostream& o, const Trio<T>& t) {
+			o << "(" << std::get<0>(t) << ", " << std::get<1>(t) << ", " << std::get<2>(t) << ")";
+			return o;
+		}
+	
+		T operator[](int index) const {
+			switch(index) {
+				case 0: return std::get<0>(*this);
+				case 1: return std::get<1>(*this);
+				case 2: return std::get<2>(*this);
+				default: throw std::out_of_range("Invalid Trio index");
+			}
 		}
 	};
 
@@ -104,6 +126,8 @@ namespace DATASTRUCT {
 		inline bool isEmpty(){return -1 == current_index;}
 		
 		inline int getMaxLen(){return max_size-1;}
+
+		//copy content of l
 		List<T>* copy( List<T>& l) override ;
 
 		public:
@@ -131,15 +155,15 @@ namespace DATASTRUCT {
 			T& get(int index) override {
 				if(index<= current_index)
 				return liste[index];
-				else {throw std::runtime_error("out of bounds")}
+				else {throw std::runtime_error("DynamicList out of bounds");}
 			}
 			void aff(std::ostream& where) const override {
-				where << "Dynamic list : " ;
+				where << "Dynamic list : [" ;
 				for(int i =0; i<=current_index; i++){
 					
-					where << liste[i] << " ";
+					where << liste[i] << ", ";
 				}
-				
+				where << "]" ;
 			}
 	};
 

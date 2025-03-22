@@ -32,6 +32,7 @@ namespace MATH {
 		y /= v.y;
 		return *this;
 	}
+	
 
 	vec2 vec2::operator+(vec2 v) {
 		
@@ -297,6 +298,13 @@ namespace MATH {
 	}
 	float vec3::dot(vec3& v) {
 		return x * v.x + y * v.y + z * v.z;
+	}
+
+	float* vec3::vecToList() const{
+		float list[4] = {
+			x, y, z
+		};
+		return list;
 	}
 
 	//vec4

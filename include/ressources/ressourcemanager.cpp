@@ -1,35 +1,58 @@
 #include "ressources/ressourcemanager.h"
 #include "ressources/ressource.h"
-#include "ressources/utility/ressourceutility.h"
+#include "utilite/parser.h"
 #include <fstream>
 
+using namespace UTILITY;
 using namespace DATASTRUCT;
 
 namespace RESSOURCES{
     RessourceManager::RessourceManager(){
         Ressources = SparseSet<Ressource*>();
-        Paths = new DynamicList<paire<std::string, int>>();
+        Paths = new DynamicList<Trio<std::string>>();
+        FactoriesFunc["a"]["mesh"] = &AbstractFactory::createMeshData;
+        Factories["a"] = new RessourceFactoryTypeA;
 
         std::ifstream inputFile(manifest_path);
-
+        
         std::string line;
         
         while(std::getline(inputFile, line)){
-            std::string temp = line;
-            std::getline(inputFile, line);
+            List<std::string> *temp = ManifestParser::parse(line);
 
-            Paths->append(std::pair<std::string, int>(temp, stoi(line)));
+            Paths->append(Trio<std::string>(temp->get(0), temp->get(1), temp->get(2)));
+
+            delete temp;
         }
 
     }
 
-    void RessourceManager::get(int ressource_index){
+    Ressource* RessourceManager::get(int ressource_index){  // si indice superieur a taille manifest????
+        load(ressource_index);
+        
+        return Ressources[ressource_index];
+    }
+
+    void RessourceManager::load(int ressource_index){
+        if(ressource_index >= Paths->len()) throw std::runtime_error("zbi ra makaynch had lfichier ");
+
+        if (Ressources.getIndex(ressource_index) ==-1){
+            createRessource(ressource_index);
+        }
+        if(!Ressources[ressource_index]->isLoaded()){
+            Ressources[ressource_index]->load();
+        }
+        
+    }
+
+    void RessourceManager::createRessource(int ressource_index){
         if (Ressources.getIndex(ressource_index)!=-1) return;
 
-        std::string ressource_path = Paths->get(ressource_index).first;
-        int ressource_type = Paths->get(ressource_index).second;
+        std::string ressource_path = (Paths->get(ressource_index))[0];
+        std::string ressource_type = (Paths->get(ressource_index))[1];
+        std::string ressource_variant = (Paths->get(ressource_index))[2];
 
-        Ressource* res = RessourceFactory::create(ressource_type, ressource_path, ressource_index);
+        Ressource* res = (Factories[ressource_variant]->*FactoriesFunc[ressource_variant][ressource_type])(ressource_path, ressource_index);//placeholder
         Ressources.set(ressource_index, res);
 
     }
@@ -37,6 +60,14 @@ namespace RESSOURCES{
         if (Ressources.getIndex(ressource_index)==-1) return;
         Ressources[ressource_index]->unload();
         Ressources.remove(ressource_index);
+    }
+
+    void RessourceManager::unloadAll(){
+        int length = Paths->len();
+        for (auto i = 0; i<length ; i++){
+            unload(i);
+        }
+
     }
 
     RessourceManager::~RessourceManager(){

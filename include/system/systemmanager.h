@@ -11,6 +11,7 @@ namespace SYSTEMS{
         public:
             SystemManager();
             void addSystem(System* s);
+            void addSystem(SYSTEM s);
 
             void initAllSystems();
             void startAllsystems();

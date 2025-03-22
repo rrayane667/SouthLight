@@ -24,7 +24,7 @@ TEST_CASE("Registry: Create and Destroy Entity", "[Registry]") {
         vis->aff(ss);
         std::string visStr = ss.str();
         // Expect the output for the Visibilite component.
-        REQUIRE(visStr == "Visibilité");
+        REQUIRE(visStr == "Visibilite");
     }
     
     Transform* trans = reg.getComponent<Transform>(0);

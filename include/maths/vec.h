@@ -1,5 +1,6 @@
 #pragma once
 #include "utilite/dataStruct.h"
+#include <ostream>
 
 
 namespace MATH {
@@ -8,10 +9,10 @@ namespace MATH {
 	struct vec2 {
 		float x, y;
 
-		vec2& operator=(DATASTRUCT::List<float> l){
-			x = l[0]; y =l[1];// a refaire
+		vec2& operator=(DATASTRUCT::List<float> *l){
+			x = l->get(0); y =l->get(1);// a refaire
 		}
-		vec2(DATASTRUCT::List<float> l){x = l[0]; y =l[1];}
+		vec2(DATASTRUCT::List<float> *l){x = l->get(0); y =l->get(1);}
 
 		vec2();
 		vec2(const float& x, const float& y);
@@ -29,6 +30,10 @@ namespace MATH {
 		vec2& operator-=(const vec2& right);
 		vec2& operator*=(const vec2& right);
 		vec2& operator/=(const vec2& right);
+		friend std::ostream& operator<<(std::ostream& o, vec2 v){
+			o << "vec3 : " << v.x << ", " << v.y;
+			return o;
+		}
 
 		vec2& add(const float& v);
 		vec2& sub(const float& v);
@@ -48,6 +53,10 @@ namespace MATH {
 		float norme();
 		vec2 normalize();
 		float dot(vec2& v);
+
+		bool operator==(const vec2& other) const {
+			return x == other.x && y == other.y;
+		}
 
 		void print();
 		
@@ -88,14 +97,24 @@ namespace MATH {
 		vec3& operator*=(const float& right);
 		vec3& operator/=(const float& right);
 
-		vec3& operator=(DATASTRUCT::List<float> l){
-			x = l[0]; y =l[1]; z = l[2];// a refaire
+		bool operator==(const vec3& other) const {
+			return x == other.x && y == other.y && z == other.z;
 		}
-		vec3(DATASTRUCT::List<float> l){x = l[0]; y =l[1]; z = l[2];}
+
+		friend std::ostream& operator<<(std::ostream& o, vec3 v){
+			o << "vec3 : " << v.x << ", " << v.y << ", " << v.z;
+			return o;
+		}
+
+		vec3& operator=(DATASTRUCT::List<float> *l){
+			x = l->get(0); y =l->get(1); z = l->get(2);// a refaire
+		}
+		vec3(DATASTRUCT::List<float> *l){x = l->get(0); y =l->get(1); z = l->get(2);}
 
 		float norme();     
 		vec3 normalize();  
 		float dot(vec3& v); 
+		float* vecToList() const;
 
 		void print();
 

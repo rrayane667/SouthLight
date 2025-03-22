@@ -13,6 +13,7 @@ namespace REG{
     class Registry{
         List<int> *hierarchy;//list de bitmask
         std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d 
+
         public:
             Registry();
             ~Registry();

@@ -56,4 +56,38 @@ namespace UTILITY{
 
         return liste;
     }
+
+    List<std::string>* ManifestParser::parse(std::string l){
+        
+        DynamicList<std::string>* liste = new DynamicList<std::string>;
+        bool is_current = true;
+        int indice = 0;
+        int size = 0;
+        int i = 0;
+
+
+
+        for(char& x:l){
+
+            
+            if((x == ' ' &&is_current)||x=='}'){
+                if(!is_current) {liste->append(l.substr(l.size(),1));break;}
+                liste->append(l.substr(indice, size));
+                
+                is_current = false;
+            }
+            else if(!is_current && x!=' '){
+                indice = i;
+                size = 1;
+                is_current = true;
+            }
+            else if(is_current){
+                size++;
+            }
+            i++;
+        }
+
+        return liste;
+    }
+
 }

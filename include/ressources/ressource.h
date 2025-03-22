@@ -17,14 +17,14 @@ namespace RESSOURCES{
         std::string path;
         Loader *loader;
         Data* data;
-        int type_variant;
+        std::string type_variant;
         int id;
 
         public:
 
             ~Ressource();
             
-            Ressource(const std::string& path, Loader* loadr_arg, int id, int type_variant);
+            Ressource(const std::string& path, Loader* loadr_arg, int id, const std::string& type_variant);
                 
             inline int getId() const {return id;}
 
@@ -34,10 +34,4 @@ namespace RESSOURCES{
 
             inline bool isLoaded() {return is_loaded;}
         };
-    
-    
-
-    
-
-    
 }
