@@ -4,11 +4,20 @@ typedef enum rendering {
     GL_TYPE
 } RENDERER_TYPE;
 
+
+Settings a;
+Settings b;
+
+
+
+
+
 class Settings {
 private:
     static RENDERER_TYPE renderer_type;
     static float WIDTH, HEIGHT;
     static Settings* ptr;
+    static unsigned int default_shader;
 
     Settings() {
         renderer_type = GL_TYPE;
@@ -30,6 +39,12 @@ public:
         }
         return ptr;
     }
+
+    static void setDefaultShader(unsigned int def){
+        default_shader = def;
+    }
+
+    inline static unsigned int getDefaultShader(){return default_shader;}
 
     static void setRenderer(RENDERER_TYPE r) {
         renderer_type = r;

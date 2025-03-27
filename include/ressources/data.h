@@ -9,6 +9,7 @@ namespace RESSOURCES
     struct Data {
         virtual ~Data() = default;
         virtual Data* clone() const= 0;
+
         
 
     };
@@ -26,6 +27,20 @@ namespace RESSOURCES
         List<MATH::vec2> *UV;
         List<MATH::vec3> *normals;
         List<paire<float, float>> *faces;
+
+        int object_ressource_index;
+
+        bool is_uv = false;
+        bool is_normal = false;
+    };
+
+    struct ShaderData : public Data{
+        inline ShaderData(const ShaderData& sd){shader =sd.shader;}
+        inline Data* clone() const override{
+            ShaderData* sd = new ShaderData(*this);
+            return sd;
+        }
+        std::string shader;
     };
 
 

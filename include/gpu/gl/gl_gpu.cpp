@@ -36,23 +36,27 @@ namespace GPU{
         glViewport(0,0, Settings::getWidth(), Settings::getHeight());
     }
 
-    unsigned int GL_GraphicsDevice::createVertexBuffer(const void* data, size_t size, unsigned int usage){
+    unsigned int GL_GraphicsDevice::createVertexBuffer(const void* data, size_t size){
         unsigned int vbo;
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+	    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
         return vbo;
     }
 
-    unsigned int GL_GraphicsDevice::createIndexBuffer(const void* data, size_t size, unsigned int usage) {
+    unsigned int GL_GraphicsDevice::createIndexBuffer(const void* data, size_t size) {
         unsigned int bufferID;
         glGenBuffers(1, &bufferID);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
         return bufferID;
     }
-
+    void GL_GraphicsDevice::structBuffer(unsigned int channel, int dimension, int stride, int start){
+        glVertexAttribPointer(channel, dimension, GL_FLOAT, GL_FALSE, stride*sizeof(float), (void*)(start * sizeof(float)));
+        glEnableVertexAttribArray(channel);
+    }
+    
     void GL_GraphicsDevice::updateBuffer(unsigned int bufferID, const void* data, size_t size) {
         glBindBuffer(GL_ARRAY_BUFFER, bufferID);
         glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);

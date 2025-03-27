@@ -17,10 +17,12 @@ namespace GPU{
         }
 
         // ---- Buffers (VBO, EBO) ----
-        unsigned int createVertexBuffer(const void* data, size_t size, unsigned int usage) override;
-        unsigned int createIndexBuffer(const void* data, size_t size, unsigned int usage) override;
+        unsigned int createVertexBuffer(const void* data, size_t size) override;
+        unsigned int createIndexBuffer(const void* data, size_t size) override;
         void updateBuffer(unsigned int bufferID, const void* data, size_t size) override;
         void deleteBuffer(unsigned int bufferID) override;
+
+        void structBuffer(unsigned int channel, int dimension, int stride, int start);
 
         // ---- Vertex Array / Pipeline State ----
         unsigned int createVertexArray() override;

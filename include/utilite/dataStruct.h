@@ -5,6 +5,7 @@
 #include <tuple>
 namespace DATASTRUCT {
 
+
 	template <typename T>
 	struct List{
 		

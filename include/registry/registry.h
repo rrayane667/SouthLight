@@ -11,6 +11,7 @@ using namespace DATASTRUCT;
 namespace REG{
     
     class Registry{
+        int total_nbr;
         List<int> *hierarchy;//list de bitmask
         std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d 
 
@@ -20,15 +21,22 @@ namespace REG{
             void createEntity();
             void destroyEntity(int entity_id);
 
-            inline int entitiesCount() {return hierarchy->len();}
+            inline int entitiesCount() const{return hierarchy->len();}
 
-            inline bool checkEntity(int entity) {return entity < hierarchy->len(); }
+            //checks if the entity exists
+            inline bool checkEntity(int entity)const {return entity < hierarchy->len(); }
             
             template <typename T>
             void addComponent(int entity_id);
+
+            template <typename T>
+            List<int>* getEntities() const;
+
+            template <typename T>
+            int& getComponentIndex(int entity_id) const;
             
             template <typename T>
-            T* getComponent(int entity_id);
+            T* getComponent(int entity_id)const;
 
             template <typename T>
             void removeComponent(int entity_id);
@@ -49,6 +57,28 @@ namespace REG{
             }
 
     };
+
+    template <typename T>
+    int& Registry::getComponentIndex(int entity_id)const{
+        return (getComponent<T>(entity_id))->instance_index;
+    }
+
+    //change to variadic
+    template <typename T>
+    List<int>* Registry::getEntities() const{
+        if(compReg->find(T::getComponentId()) == compReg->end()){
+            return nullptr;
+        }
+
+        List<int>* l = new DynamicList<int>;
+        int i =0;
+        for(auto& x:(*compReg)[T::getComponentId()]){
+            if (x!=-1){l->append(i++);}
+        }
+
+        if(!(l->len())) return nullptr;
+        return l;
+    }
     
 
     template <typename T>
@@ -56,11 +86,11 @@ namespace REG{
         if(compReg->find(T::getComponentId()) == compReg->end()){
             (*compReg)[T::getComponentId()] = SparseSet<Component*>();
         }
-        (*compReg)[T::getComponentId()].set(entity_id,new T());
+        (*compReg)[T::getComponentId()].set(entity_id,new T(total_nbr++));
     }
 
     template <typename T>
-    T* Registry::getComponent(int entity_id){
+    T* Registry::getComponent(int entity_id) const{
         if(compReg->find(T::getComponentId()) == compReg->end()){
             throw std::runtime_error("object doesnt have this component");
             

@@ -28,6 +28,8 @@ namespace RESSOURCES{
                 
             inline int getId() const {return id;}
 
+            inline Data* getData(){return data;}
+
             void load();
 
             void unload();

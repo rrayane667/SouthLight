@@ -81,9 +81,9 @@ namespace RESSOURCES{
             else if(line.substr(0,1) == "f"){
                 List<float>* face = (UTILITY::NumberParser::parse(line));
                 if (face->len() >= 6) { 
-                    data.faces->append(paire<float, float>(face->get(0), face->get(1)));
-                    data.faces->append(paire<float, float>(face->get(2), face->get(3)));
-                    data.faces->append(paire<float, float>(face->get(4), face->get(5)));
+                    data.faces->append(paire<float, float>(face->get(0)-1, face->get(1)-1));
+                    data.faces->append(paire<float, float>(face->get(2)-1, face->get(3)-1));
+                    data.faces->append(paire<float, float>(face->get(4)-1, face->get(5)-1));
                 }
                 delete face;
                 

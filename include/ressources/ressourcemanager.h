@@ -26,6 +26,7 @@ namespace RESSOURCES{
         public:
         
             Ressource* get(int ressource_index);
+            Data* getData(int ressource_index){return get(ressource_index)->getData();}
             void createRessource(int ressource_index);
             void load(int ressource_index);
             void unload(int ressource_index);

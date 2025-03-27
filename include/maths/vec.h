@@ -66,6 +66,7 @@ namespace MATH {
 		float x, y, z;
 
 		vec3();
+		inline vec3(const vec2& v){x=v.x; y=v.y; z=0;}
 		vec3(const float& x, const float& y, const float& z);
 		vec3& add(const vec3& v);
 		vec3& sub(const vec3& v);

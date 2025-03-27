@@ -8,6 +8,8 @@ using namespace MATH;
 
 namespace REG{
     struct Component{
+        int instance_index;
+        inline Component(int index){ instance_index = index;}
         virtual void aff(std::ostream& ) = 0;
         friend std::ostream& operator<<(std::ostream& o, Component* c){
             c->aff(o);
@@ -17,6 +19,7 @@ namespace REG{
     };
 
     struct Visibilite : public Component{
+        inline Visibilite(int index) : Component(index) {}
         static inline std::string getComponentId()  {return "Visibilite";}
         bool isActive = true;
         void aff(std::ostream& o) override { 
@@ -25,6 +28,7 @@ namespace REG{
     };
 
     struct Transform : public Component{
+        inline Transform(int index) : Component(index) {}
         static inline std::string getComponentId()  {return "Transform";}
         vec3 position;
         vec3 rotation;
@@ -35,12 +39,19 @@ namespace REG{
     };
 
     struct Mesh : public Component{
+        inline Mesh(int index) : Component(index) {}
         static inline std::string getComponentId()  {return "Mesh";}
-        unsigned int data;
-        unsigned int ressource;
+        unsigned int vao;
+        unsigned int vbo;
+        unsigned int ebo;
+
+        int vertex_count;
+        
+
+        int ressource;
         bool is_loaded;
         void aff(std::ostream& o) override {
-            o << "Mesh : " << data;
+            o << "Mesh : " << vao;
         }
     };
 
@@ -49,14 +60,21 @@ namespace REG{
     };
 
     struct Material : public Component {
-        unsigned int vert_shader;
-        unsigned int frag_shader;
-        unsigned int prog_shader;
+        static inline std::string getComponentId()  {return "Material";}
+        inline Material(int index) : Component(index) {}
+        inline Material() : Component(-1) {}
 
-        bool is_vert_loaded;
-        bool is_frag_loaded;
-        bool is_prog_loaded;
+        unsigned int shader;
+
+        int frag_index;
+        int vert_index;
+
+        bool is_loaded;
+
         ShaderData* data;
+        void aff(std::ostream& o) override {
+            o << "Material : " << data;
+        }
     };
 
     

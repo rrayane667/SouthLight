@@ -20,6 +20,7 @@ namespace REG{
 
     
     Registry::Registry(){
+        total_nbr = 1;
         std::cout << "Constructing Registry..." << std::endl;
         hierarchy = new DynamicList<int>();
         compReg = new std::unordered_map<std::string,SparseSet<Component*>>;

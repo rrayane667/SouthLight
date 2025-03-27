@@ -2,11 +2,17 @@
 #include <string>
 #include "maths/vec.h"
 #include "settings/settings.cpp"
+#include "gpu/gl/gl_gpu.h"
 
 using namespace MATH; 
 
 namespace GPU{
-
+    struct ProcessedMesh {
+        float* vertices;
+        unsigned int* indices;
+        size_t vertexCount;
+        size_t indexCount;
+    };
 
 
     class GraphicsDevice{
@@ -25,11 +31,13 @@ namespace GPU{
             }
         }
 
-        // ---- Buffers (VBO, IBO, UBO) ----
-        virtual unsigned int createVertexBuffer(const void* data, size_t size, unsigned int usage) = 0;
-        virtual unsigned int createIndexBuffer(const void* data, size_t size, unsigned int usage) = 0;
+        // ---- Buffers (VBO, EBO) ----
+        virtual unsigned int createVertexBuffer(const void* data, size_t size) = 0;
+        virtual unsigned int createIndexBuffer(const void* data, size_t size) = 0;
         virtual void updateBuffer(unsigned int bufferID, const void* data, size_t size) = 0;
         virtual void deleteBuffer(unsigned int bufferID) = 0;
+
+        virtual void structBuffer(unsigned int channel, int dimension, int stride, int start) = 0;
 
         // ---- Vertex Array / Pipeline State ----
         virtual unsigned int createVertexArray() = 0;
@@ -52,6 +60,9 @@ namespace GPU{
         // ---- Draw Calls ----
         virtual void drawIndexed(unsigned int count) = 0;
         virtual void drawArrays(unsigned int count) = 0;
+
+        // ---- arriere plan ----
+        virtual void color() = 0;
 
         // ---- Synchronisation ----
         //virtual void waitForGPU() = 0;
