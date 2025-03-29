@@ -1,7 +1,7 @@
 #pragma once
 #include "utilite/dataStruct.h"
 #include "system.h"
-
+#include "registry/registry.h"
 using namespace DATASTRUCT;
 
 namespace SYSTEMS{
@@ -9,13 +9,13 @@ namespace SYSTEMS{
         DynamicList<System*> systems;
 
         public:
-            SystemManager();
+            inline SystemManager() {std::cout << "System manager constructed" << std::endl;std::cout << std::endl;};
             void addSystem(System* s);
             void addSystem(SYSTEM s);
 
-            void initAllSystems();
-            void startAllsystems();
-            void updateAllSystems();
-            void shutdown();//????
+            void initAllSystems(REG::Registry& reg);
+            void startAllsystems(REG::Registry& reg);
+            void updateAllSystems(REG::Registry& reg);
+            void shutdown(REG::Registry& reg);//????
     };
 }

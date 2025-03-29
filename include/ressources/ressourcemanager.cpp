@@ -8,6 +8,7 @@ using namespace DATASTRUCT;
 
 namespace RESSOURCES{
     RessourceManager::RessourceManager(){
+        std::cout << "Constructing Ressource manager..." << std::endl;
         Ressources = SparseSet<Ressource*>();
         Paths = new DynamicList<Trio<std::string>>();
         FactoriesFunc["a"]["mesh"] = &AbstractFactory::createMeshData;
@@ -24,7 +25,8 @@ namespace RESSOURCES{
 
             delete temp;
         }
-
+        std::cout << "Ressource manager Constructed " << std::endl;
+        std::cout << std::endl;
     }
 
     Ressource* RessourceManager::get(int ressource_index){  // si indice superieur a taille manifest????

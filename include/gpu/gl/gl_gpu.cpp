@@ -1,11 +1,22 @@
 #include "gpu/gl/gl_gpu.h"
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
+
 #include<iostream>
 #include "settings/settings.cpp"
 
 namespace GPU{
+    void GL_GraphicsDevice::events(){
+        
+        if (glfwGetKey(reinterpret_cast<GLFWwindow*>(window), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(reinterpret_cast<GLFWwindow*>(window), true);
+        glfwPollEvents();
+    }
+    bool GL_GraphicsDevice::windowCheck(){
+        return !glfwWindowShouldClose(reinterpret_cast<GLFWwindow*>(window));
+    }
+
     void GL_GraphicsDevice::initialisation(){
+
+        std::cout << "setting up to opengl..." << std::endl;
         //initialisation glfw
         glfwInit();
 
@@ -18,7 +29,7 @@ namespace GPU{
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         //creation objet GLFWwindow 800x800px
-        GLFWwindow* window = glfwCreateWindow(800, 800, "South light", NULL, NULL);
+        window = glfwCreateWindow(Settings::getWidth(), Settings::getHeight(), "South light", NULL, NULL);
         //au cas ou erreur
         if (window == NULL)
         {
@@ -27,13 +38,15 @@ namespace GPU{
             return;
         }
         //dire quelle window utiliser
-        glfwMakeContextCurrent(window);
+        glfwMakeContextCurrent(reinterpret_cast<GLFWwindow*> (window));
 
         //charger GLAD
         gladLoadGL();
 
         //viewport dimensions
         glViewport(0,0, Settings::getWidth(), Settings::getHeight());
+        std::cout << "opengl t9ad" << std::endl;
+        std::cout << std::endl;
     }
 
     unsigned int GL_GraphicsDevice::createVertexBuffer(const void* data, size_t size){
@@ -90,7 +103,7 @@ namespace GPU{
         glUniform3fv(location, 1, (vector->vecToList()) );
     }
 
-    void setUniform(unsigned int shaderID, const std::string& name, float value){
+    void GL_GraphicsDevice::setUniform(unsigned int shaderID, const std::string& name, float value){
         int location = glGetUniformLocation(shaderID, name.c_str());
         glUniform1f(location, value);
     }
@@ -155,5 +168,15 @@ namespace GPU{
     
     void GL_GraphicsDevice::deleteShader(unsigned int shaderID) {
         glDeleteProgram(shaderID);
+    }
+
+    void GL_GraphicsDevice::color(){
+        glClearColor(0.168f, 0.112f, 0.255f, 1.0f);
+
+		glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    void GL_GraphicsDevice::swapBuffers(){
+        glfwSwapBuffers(reinterpret_cast<GLFWwindow*> (window));
     }
 }

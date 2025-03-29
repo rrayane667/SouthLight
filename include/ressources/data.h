@@ -9,19 +9,24 @@ namespace RESSOURCES
     struct Data {
         virtual ~Data() = default;
         virtual Data* clone() const= 0;
-
+        std::string name = "default";
         
 
     };
     struct MeshData : public Data{
-        ~MeshData() override{
-            delete vertices, UV, normals, faces;
+        inline ~MeshData() override {
+            delete vertices;
+            delete UV;
+            delete normals;
+            delete faces;
         }
 
         MeshData* clone() const override;
         MeshData(const MeshData& m_data);
         MeshData() ;
         MeshData& operator=(const MeshData&);
+
+        
 
         List<MATH::vec3> *vertices;
         List<MATH::vec2> *UV;
@@ -35,12 +40,12 @@ namespace RESSOURCES
     };
 
     struct ShaderData : public Data{
-        inline ShaderData(const ShaderData& sd){shader =sd.shader;}
+        inline ShaderData(const ShaderData& sd){shaderString =sd.shaderString;}
         inline Data* clone() const override{
             ShaderData* sd = new ShaderData(*this);
             return sd;
         }
-        std::string shader;
+        std::string shaderString;
     };
 
 

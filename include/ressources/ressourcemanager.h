@@ -31,6 +31,7 @@ namespace RESSOURCES{
             void load(int ressource_index);
             void unload(int ressource_index);
             void unloadAll();
+            
             RessourceManager();
             ~RessourceManager();
             void update(int ressource_index); // a implementer

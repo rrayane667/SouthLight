@@ -31,7 +31,7 @@ namespace MATH {
 		vec2& operator*=(const vec2& right);
 		vec2& operator/=(const vec2& right);
 		friend std::ostream& operator<<(std::ostream& o, vec2 v){
-			o << "vec3 : " << v.x << ", " << v.y;
+			o << "vec2 : " << v.x << ", " << v.y;
 			return o;
 		}
 

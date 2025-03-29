@@ -13,6 +13,7 @@ using namespace RESSOURCES;
 using namespace SYSTEMS;
 using namespace GPU;
 
+
 namespace ENGINE {
     
 
@@ -32,10 +33,24 @@ namespace ENGINE {
         void onStart();
         void onUpdate();
         void onExit();
-        ProcessedMesh freeProcessedMesh(ProcessedMesh* mesh);
+        void freeProcessedMesh(ProcessedMesh* mesh);
         public:
             Engine(RENDERER_TYPE type);
 
+            template <typename T>
+            inline Component* getComponent(int entity){return Reg.getComponent<T>(entity);}
+
+            template <typename T>
+            inline void addComponent(int entity){return Reg.addComponent<T>(entity);}
+
+            template <typename T>
+            inline void removeComponent(int entity){return Reg.removeComponent<T>(entity);}
+
+            inline int createEntity(){return Reg.createEntity();}
+
+            inline void addSystem(SYSTEM s){return SysMan.addSystem(s);}
+
+            void processEvents();
             void processMaterials();
             void processMeshes();
             

@@ -1,1 +1,2 @@
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\teapot.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\plan.obj mesh a}

@@ -2,11 +2,12 @@
 
 namespace REG{
 
-    void Registry::createEntity(){
+    int Registry::createEntity(){
         hierarchy->append(3);
         addComponent<Visibilite>(hierarchy->len()-1);
         addComponent<Transform>(hierarchy->len()-1);
         //ajout des component dans les sparse sets correspondants
+        return hierarchy->len();
 
     }
 
@@ -25,6 +26,7 @@ namespace REG{
         hierarchy = new DynamicList<int>();
         compReg = new std::unordered_map<std::string,SparseSet<Component*>>;
         std::cout << "Registry constructed." << std::endl;
+        std::cout << std::endl;
     }
 
     Registry::~Registry(){

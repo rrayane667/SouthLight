@@ -55,9 +55,7 @@ namespace REG{
         }
     };
 
-    struct ShaderData {
-
-    };
+ 
 
     struct Material : public Component {
         static inline std::string getComponentId()  {return "Material";}
@@ -71,9 +69,8 @@ namespace REG{
 
         bool is_loaded;
 
-        ShaderData* data;
         void aff(std::ostream& o) override {
-            o << "Material : " << data;
+            o << "Material : " << shader;
         }
     };
 

@@ -1,10 +1,14 @@
 #include "gpu/gpu.h"
-
+#include<glad/glad.h>
+#include<GLFW/glfw3.h>
 
 namespace GPU{
 
+
+
     class GL_GraphicsDevice : public GraphicsDevice{
         void initialisation() override;
+
 
 
         public:
@@ -12,6 +16,8 @@ namespace GPU{
         static GL_GraphicsDevice* getInstanceGL(){
             if (ptr == nullptr){
                 ptr = new GL_GraphicsDevice;
+                (dynamic_cast<GL_GraphicsDevice*>(ptr))->initialisation();
+    
             }
             return dynamic_cast<GL_GraphicsDevice*> (ptr);
         }
@@ -45,6 +51,12 @@ namespace GPU{
         // ---- Draw Calls ----
         void drawIndexed(unsigned int count) override;
         void drawArrays(unsigned int count) override;
+
+        void color() override;
+        void swapBuffers() override;
+
+        void events() override;
+        bool windowCheck() override;
 
         // ---- Synchronisation ----
         //void waitForGPU() override;

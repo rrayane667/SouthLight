@@ -18,7 +18,7 @@ namespace REG{
         public:
             Registry();
             ~Registry();
-            void createEntity();
+            int createEntity();
             void destroyEntity(int entity_id);
 
             inline int entitiesCount() const{return hierarchy->len();}
@@ -71,9 +71,11 @@ namespace REG{
         }
 
         List<int>* l = new DynamicList<int>;
-        int i =0;
-        for(auto& x:(*compReg)[T::getComponentId()]){
-            if (x!=-1){l->append(i++);}
+
+
+        SparseSet<Component *>& ss = (*compReg)[T::getComponentId()];
+        for(int i = 0; i<ss.getSparseLen();i++){
+            if (ss.getIndex(i)!=-1){l->append(i++);}
         }
 
         if(!(l->len())) return nullptr;

@@ -2,6 +2,7 @@
 #include "registry/registry.h"
 #include "gpu/gpu.h"
 #include <unordered_map>
+#include <iostream>
 
 using namespace REG;
 using namespace GPU;
@@ -16,6 +17,11 @@ namespace SYSTEMS{
             virtual void ondestroy() = 0;
 
             virtual int getId() = 0;
+
+            friend std::ostream& operator<<(std::ostream& o, System& s){
+                o << s.getId();
+                return o;
+            }
     };
 
 
@@ -27,16 +33,15 @@ namespace SYSTEMS{
         public:
 
             Renderer();
-            ~Renderer();
+            ~Renderer() = default;
 
-            void render(const REG::Registry& reg);
 
             void onInit(REG::Registry& reg) override;
-            void onStart(REG::Registry& reg) override;
+            inline void onStart(REG::Registry& reg) {}
             void update(REG::Registry& reg) override;
-            void ondestroy() override;
+            inline void ondestroy() {}
 
-            int getId() override;
+            inline int getId() override{return 0;}
     };
 
 
@@ -46,9 +51,8 @@ namespace SYSTEMS{
         COLLISION
     } SYSTEM;
 
-    class SystemFactory{
-        public:
+    struct SystemFactory{
 
-            System* createSystem(SYSTEM type);
+        static System* createSystem(SYSTEM type);
     };
 }

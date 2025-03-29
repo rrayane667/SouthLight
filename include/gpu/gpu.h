@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include "maths/vec.h"
-#include "settings/settings.cpp"
-#include "gpu/gl/gl_gpu.h"
+
+
 
 using namespace MATH; 
 
@@ -17,19 +17,15 @@ namespace GPU{
 
     class GraphicsDevice{
         protected :
-        GraphicsDevice(){initialisation();}
+        GraphicsDevice() = default;
         virtual void initialisation() = 0;
 
-        static GraphicsDevice* ptr;
+        static inline GraphicsDevice* ptr = nullptr;
+        static inline void* window= nullptr;
+
         public:
 
-        static GraphicsDevice* getInstance(){
-            RENDERER_TYPE t = Settings::getRendererType();
-            if (t = GL_TYPE){
-                if (ptr != nullptr) delete ptr;
-                ptr = GL_GraphicsDevice::getInstanceGL();
-            }
-        }
+        static GraphicsDevice* getInstance();
 
         // ---- Buffers (VBO, EBO) ----
         virtual unsigned int createVertexBuffer(const void* data, size_t size) = 0;
@@ -60,9 +56,13 @@ namespace GPU{
         // ---- Draw Calls ----
         virtual void drawIndexed(unsigned int count) = 0;
         virtual void drawArrays(unsigned int count) = 0;
+        virtual void swapBuffers() = 0;
 
         // ---- arriere plan ----
         virtual void color() = 0;
+
+        virtual void events() = 0;
+        virtual bool windowCheck() = 0;
 
         // ---- Synchronisation ----
         //virtual void waitForGPU() = 0;

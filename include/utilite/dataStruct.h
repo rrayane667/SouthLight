@@ -35,6 +35,60 @@ namespace DATASTRUCT {
 
 	};
 
+	template <typename T>
+	class DynamicList : public List<T>{
+		T* liste;
+		int max_size;
+		int current_index;
+		inline bool isFull(){return max_size == current_index + 1;}
+		inline bool isEmpty(){return -1 == current_index;}
+		
+		inline int getMaxLen(){return max_size-1;}
+
+		//copy content of l
+		List<T>* copy( List<T>& l) override ;
+
+		public:
+			
+			
+			DynamicList(DynamicList<T>* l){copy(*l);};
+			DynamicList<T>& operator=(const DynamicList<T>& dl);
+
+			inline T* begin() override { return liste; } 
+			inline T* end() override { return liste + current_index + 1; }
+			void swap(int ind1, int ind2) override;
+			
+			DynamicList();
+			~DynamicList() override;
+			void append(const T& el) override;
+			void remove(int index) override;
+			void insert(int index, T& el) override;
+			int capacity() override{return max_size;}
+			void reserve(int new_maximun_size) override;
+			inline int len() override{return current_index+1;}
+			T pop() override;
+			
+			inline T& operator[](int index) override{//checker si index existe????
+				return get(index);
+			}
+			T& get(int index) override {
+				if(index<= current_index)
+				return liste[index];
+				else {throw std::runtime_error("DynamicList out of bounds");}
+			}
+
+			
+			inline void aff(std::ostream& where) const override {
+				where << "Dynamic list : [" ;
+				for(int i =0; i<=current_index; i++){
+					
+					where << "a"; //(liste[i]) << ", ";
+				}
+				where << "]" ;
+			}
+	};
+
+
 	template <typename T, typename U>
 	class paire : public std::pair<T, U> {
 	public:
@@ -93,6 +147,8 @@ namespace DATASTRUCT {
 				return *this;
 			}
 
+			inline int getSparseLen() {return sparse->len();}
+
 			inline int getIndex(int index){ return index<sparse->len()?(*sparse)[index]:-1;}
 
 			inline T& operator[](int index) {
@@ -118,56 +174,7 @@ namespace DATASTRUCT {
 	};
 	
 
-	template <typename T>
-	class DynamicList : public List<T>{
-		T* liste;
-		int max_size;
-		int current_index;
-		inline bool isFull(){return max_size == current_index + 1;}
-		inline bool isEmpty(){return -1 == current_index;}
-		
-		inline int getMaxLen(){return max_size-1;}
-
-		//copy content of l
-		List<T>* copy( List<T>& l) override ;
-
-		public:
-			
-			
-			DynamicList(DynamicList<T>* l){copy(*l);};
-			DynamicList<T>& operator=(const DynamicList<T>& dl);
-
-			inline T* begin() override { return liste; } 
-			inline T* end() override { return liste + current_index + 1; }
-			void swap(int ind1, int ind2) override;
-			DynamicList();
-			~DynamicList() override;
-			void append(const T& el) override;
-			void remove(int index) override;
-			void insert(int index, T& el) override;
-			int capacity() override{return max_size;}
-			void reserve(int new_maximun_size) override;
-			inline int len() override{return current_index+1;}
-			T pop() override;
-			
-			inline T& operator[](int index) override{//checker si index existe????
-				return get(index);
-			}
-			T& get(int index) override {
-				if(index<= current_index)
-				return liste[index];
-				else {throw std::runtime_error("DynamicList out of bounds");}
-			}
-			void aff(std::ostream& where) const override {
-				where << "Dynamic list : [" ;
-				for(int i =0; i<=current_index; i++){
-					
-					where << liste[i] << ", ";
-				}
-				where << "]" ;
-			}
-	};
-
+	
 	template <typename T>
 	class Stack : public DynamicList<T>{
 		public:

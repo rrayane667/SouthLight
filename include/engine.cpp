@@ -3,77 +3,98 @@
 #include <string>
 #include <unordered_map>
 #include <tuple>
+#include <functional>
+#include <vector>
+#include <cstring>
 
 using namespace REG;
 
 
+
 namespace ENGINE{
+
+
     Engine::Engine(RENDERER_TYPE type) : SysMan(), EvMan(), Reg(), RessMan() {
+        std::cout << "CStarting Engine..." << std::endl;
         s = Settings::getInstance();
         s->setRenderer(type);
        gpu =  GraphicsDevice::getInstance();
+       std::cout << "Engine khdam" << std::endl;
+       std::cout << std::endl;
     }
 
-    ProcessedMesh Engine::freeProcessedMesh(ProcessedMesh* mesh) {
+    void Engine::freeProcessedMesh(ProcessedMesh* mesh) {
         delete[] mesh->vertices;
         delete[] mesh->indices;
         mesh->vertexCount = 0;
         mesh->indexCount = 0;
     }
 
-    ProcessedMesh Engine::processMesh(const MeshData& d) {
-        struct KeyHasher {
-            size_t operator()(const std::tuple<float,float,float,float,float,float>& k) const {
-                auto hash = std::hash<float>();
-                size_t seed = 0;
-                seed ^= hash(std::get<0>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-                seed ^= hash(std::get<1>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-                seed ^= hash(std::get<2>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-                seed ^= hash(std::get<3>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-                seed ^= hash(std::get<4>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-                seed ^= hash(std::get<5>(k)) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+
+    struct TupleHash {
+        template <typename Tuple>
+        std::size_t operator()(const Tuple& tuple) const {
+            return std::apply([](auto&&... args) -> std::size_t {
+                std::size_t seed = 0;
+                // Combine each element's hash into one seed value
+                ((seed ^= std::hash<std::decay_t<decltype(args)>>{}(args) + 0x9e3779b9 + (seed << 6) + (seed >> 2)), ...);
                 return seed;
-            }
-        };
-    
-        std::unordered_map<std::tuple<float,float,float,float,float,float>, unsigned int, KeyHasher> hash;
-        unsigned int uniqueCount = 0;
-    
-        for(size_t i = 0; i < d.faces->len(); ++i) {
-            auto& face = d.faces->get(i);
-            MATH::vec3 v = d.vertices->get(static_cast<int>(face.first));
-            MATH::vec3 n = d.normals->get(static_cast<int>(face.second));
-            auto key = std::make_tuple(v.x, v.y, v.z, n.x, n.y, n.z);
-            if(hash.find(key) == hash.end()) hash[key] = uniqueCount++;
+            }, tuple);
         }
-    
-        ProcessedMesh result;
-        result.vertexCount = uniqueCount;
-        result.indexCount = d.faces->len();
-        result.vertices = new float[result.vertexCount * 6];
-        result.indices = new unsigned int[result.indexCount];
-    
-        hash.clear();
-        unsigned int currentIndex = 0;
-    
-        for(size_t i = 0; i < d.faces->len(); ++i) {
-            auto& face = d.faces->get(i);
-            MATH::vec3 v = d.vertices->get(static_cast<int>(face.first));
-            MATH::vec3 n = d.normals->get(static_cast<int>(face.second));
-            auto key = std::make_tuple(v.x, v.y, v.z, n.x, n.y, n.z);
-    
-            if(hash.find(key) == hash.end()) {
-                float* ptr = result.vertices + (currentIndex * 6);
-                ptr[0] = v.x; ptr[1] = v.y; ptr[2] = v.z;
-                ptr[3] = n.x; ptr[4] = n.y; ptr[5] = n.z;
-                hash[key] = currentIndex++;
-            }
-    
-            result.indices[i] = hash[key];
+    };
+
+ProcessedMesh Engine::processMesh(const MeshData& d) {
+    std::cout << "processing " << d.name << std::endl;
+
+    // Use the custom TupleHash for the unordered_map key
+    std::unordered_map<std::tuple<float, float, float, float, float, float>, unsigned int, TupleHash> vertexMap;
+    std::vector<float> vertexBuffer;
+    std::vector<unsigned int> indexBuffer;
+
+    unsigned int currentIndex = 0;
+
+    for (size_t i = 0; i < d.faces->len(); ++i) {
+        auto& face = d.faces->get(i);
+
+        MATH::vec3 v = d.vertices->get(static_cast<int>(face.first));
+        MATH::vec3 n = d.normals->get(static_cast<int>(face.second));
+
+        auto key = std::make_tuple(v.x, v.y, v.z, n.x, n.y, n.z);
+
+        auto it = vertexMap.find(key);
+        if (it == vertexMap.end()) {
+            // New unique vertex, add to map and vertex buffer
+            vertexMap[key] = currentIndex;
+            vertexBuffer.push_back(v.x);
+            vertexBuffer.push_back(v.y);
+            vertexBuffer.push_back(v.z);
+            vertexBuffer.push_back(n.x);
+            vertexBuffer.push_back(n.y);
+            vertexBuffer.push_back(n.z);
+            indexBuffer.push_back(currentIndex);
+            ++currentIndex;
+        } else {
+            // Existing vertex, reuse index
+            indexBuffer.push_back(it->second);
         }
-    
-        return result;
     }
+
+    ProcessedMesh result;
+    result.vertexCount = static_cast<unsigned int>(vertexBuffer.size() / 6);
+    result.indexCount = static_cast<unsigned int>(indexBuffer.size());
+
+    // Allocate and copy vertex data
+    result.vertices = new float[vertexBuffer.size()];
+    std::memcpy(result.vertices, vertexBuffer.data(), vertexBuffer.size() * sizeof(float));
+
+    // Allocate and copy index data
+    result.indices = new unsigned int[indexBuffer.size()];
+    std::memcpy(result.indices, indexBuffer.data(), indexBuffer.size() * sizeof(unsigned int));
+
+    std::cout << d.name << " processed" << std::endl << std::endl;
+    return result;
+}
+    
 
     void Engine::processMeshes() {
         List<int>* entities = Reg.getEntities<Mesh>();
@@ -110,12 +131,13 @@ namespace ENGINE{
                 Material* mat;
                 mat = Reg.getComponent<Material>(x);
 
-                std::string vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shader;
-                std::string frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shader;
+                std::string vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
+                std::string frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
 
 
                 mat->shader = gpu->createShader(vert, frag);
                 mat->is_loaded = true;
+
 
             }
             catch(...){
@@ -148,31 +170,39 @@ namespace ENGINE{
                                             "}\n";
 
         Settings::setDefaultShader(gpu->createShader(default_vert_shader, default_frag_shader));
-        processMaterials();
+        
         processMeshes();
-        SysMan.initAllSystems();
+        processMaterials();
+        SysMan.initAllSystems(Reg);
     }
 
     void Engine::onStart(){
-        SysMan.startAllsystems();
+        SysMan.startAllsystems(Reg);
     }
 
     void Engine::onUpdate(){
-        SysMan.updateAllSystems();
+        SysMan.updateAllSystems(Reg);
     }
 
     void Engine::onExit(){
 
-        SysMan.shutdown();
+        SysMan.shutdown(Reg);
     }
 
     void Engine::run(){
         onInit();
         onStart();
-        // loop update
+        while(gpu->windowCheck()){
+            processEvents();
+            onUpdate();
+            
+        }
 
         onExit();
         
+    }
+    void Engine::processEvents(){
+        gpu->events();
     }
 
 

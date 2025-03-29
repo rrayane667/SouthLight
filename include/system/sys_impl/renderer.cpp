@@ -6,6 +6,8 @@ using namespace REG;
 namespace SYSTEMS{
     
     Renderer::Renderer(){
+        std::cout << std::endl;
+        std::cout << "Creating Renderer"<<std::endl;
         
         gpu = GraphicsDevice::getInstance();
 
@@ -17,7 +19,7 @@ namespace SYSTEMS{
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();
 
-        
+        std::cout << "initialisation du Renderer"<<std::endl;
         for(auto& x:(*entities_list)){
             unsigned int shadeur = (reg.getComponent<Material>(x))->shader ;
             if (entities.find(shadeur) == entities.end()){
@@ -32,7 +34,6 @@ namespace SYSTEMS{
         
     }
 
-    void Renderer::onStart(REG::Registry& reg){}
 
     void Renderer::update(REG::Registry& reg){
         for(const auto& keyvalue: entities){
@@ -42,11 +43,11 @@ namespace SYSTEMS{
             gpu->useShader(shadeur);
             for(const auto& x:(*entite)){
 
-                glClearColor(0.168f, 0.112f, 0.255f, 1.0f);
+                gpu->color();
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
                 gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
-
-                glfwSwapBuffers(window);
+                gpu->swapBuffers();
+                
 
 
             }

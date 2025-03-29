@@ -1,5 +1,6 @@
 #include "systemmanager.h"
 #include "utilite/dataStruct.h"
+
 using namespace DATASTRUCT;
 
 namespace SYSTEMS{
@@ -7,24 +8,40 @@ namespace SYSTEMS{
     systems.append(s);
    }
 
-   void SystemManager::initAllSystems(){
+   void SystemManager::addSystem(SYSTEM s){
+    if(s== RENDERER){
+        System* sys = new Renderer;
+        systems.append(sys);
+    }
+    
+   }
+
+
+   void SystemManager::initAllSystems(REG::Registry& reg){
     for(auto& x:systems){
         
-        x->onInit();
+        x->onInit(reg);
     }
    }
 
-   void SystemManager::startAllsystems(){
+   void SystemManager::startAllsystems(REG::Registry& reg){
     for(auto& x:systems){
         
-        x->onStart();
+        x->onStart(reg);
     }
    }
    
-   void SystemManager::updateAllSystems(){
+   void SystemManager::updateAllSystems(REG::Registry& reg){
     for(auto& x:systems){
         
-        x->update();
+        x->update(reg);
+    }
+   }
+
+   void SystemManager::shutdown(REG::Registry& reg){
+    for(auto& x:systems){
+        
+        x->ondestroy();
     }
    }
 }
