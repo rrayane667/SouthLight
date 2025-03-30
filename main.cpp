@@ -24,6 +24,8 @@ int main(int, char**){
     t->scale = vec3(0.2f,0.2f,0.2f);
     t->position = vec3(0.0f,-2.0f,10.0f);
     //t->rotation = vec3(0.0f,0.0f,1.5f);
+    stpKhdm.addComponent<Camera>(stpKhdm.createEntity());
+
     
     stpKhdm.run();
 

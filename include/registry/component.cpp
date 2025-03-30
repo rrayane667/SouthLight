@@ -83,9 +83,33 @@ namespace REG{
         ORTHOGRAPHIQUE
     } ProjectionType;
 
-    struct Camera : public Component{
-        ProjectionType projection;
+    struct CameraPerspective{
+        float fov = 0.785, ratio = 800.0f / 600.0f, n = 0.1f, f=100;
     };
+    struct CameraOrthographique{
+        float r=0, l=0, n=0, t=0, b=0, f=0;
+    };
+    struct Camera : public Component{
+        Camera(int index) : Component(index){cp = new CameraPerspective;}
+        static inline std::string getComponentId()  {return "Camera";} 
+
+        ProjectionType projection = PERSPECTIVE;
+        
+        union{
+            CameraPerspective* cp;
+            CameraOrthographique* co;
+        };
+        void aff(std::ostream& o) override { 
+            o << "camera : " << projection;
+        }
+        
+
+    };
+
+    struct Light : public Component{
+        float light_intensity;
+    };
+    
 
     
 

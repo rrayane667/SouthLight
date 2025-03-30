@@ -20,6 +20,8 @@ namespace SYSTEMS{
         //init : load ressource into gpu based on the component/ stores vao into component
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();
+        cam = reg.getComponent<Camera>( reg.getEntities<Camera>()->get(0));
+        camTrans = reg.getComponent<Transform>( reg.getEntities<Camera>()->get(0));
 
         std::cout << *entities_list << std::endl;
 
@@ -40,11 +42,14 @@ namespace SYSTEMS{
 
 
     void Renderer::update(REG::Registry& reg){
-        mat4 projection = mat4::perspective(0.785, 800.0f / 600.0f, 0.1f, 100);
+        mat4 projection;
+        if (cam->projection == PERSPECTIVE) projection = mat4::perspective(cam->cp->fov, cam->cp->ratio,cam->cp->n ,cam->cp->f );
+        else projection = mat4::orthographic(cam->co->r, cam->co->l, cam->co->t, cam->co->b, cam->co->n, cam->co->f);
+        
 		    mat4 view = mat4::view(
-			    vec4(0.0f, 0.0f, 1.0f, 1.0f), // Correct w = 1.0f for position
-			    vec4(0.0f, 0.0f, 0.0f, 1.0f), // Correct w = 1.0f for position
-			    vec4(0.0f, 1.0f, 0.0f, 0.0f)  // Correct w = 0.0f for direction
+			    vec4(0.0f, 0.0f, 1.0f, 1.0f), 
+			    vec4(camTrans->position.x, camTrans->position.y, camTrans->position.z, 1.0f), 
+			    vec4(0.0f, 1.0f, 0.0f, 0.0f)  
             );
         for(const auto& keyvalue: entities){
             

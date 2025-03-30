@@ -59,6 +59,8 @@ namespace SYSTEMS{
         GraphicsDevice* gpu;
 
         std::unordered_map<unsigned int, List<int>*> entities;
+        Camera* cam;
+        Transform* camTrans;
         public:
 
             Renderer();
