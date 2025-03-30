@@ -45,7 +45,7 @@ namespace RESSOURCES
             ShaderData* sd = new ShaderData(*this);
             return sd;
         }
-        std::string shaderString;
+        const char* shaderString;
     };
 
 

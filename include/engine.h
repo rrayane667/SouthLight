@@ -29,12 +29,14 @@ namespace ENGINE {
 
         
 
-        void onInit();
+        
         void onStart();
-        void onUpdate();
+        
         void onExit();
         void freeProcessedMesh(ProcessedMesh* mesh);
         public:
+        void onInit();
+        void onUpdate();
             Engine(RENDERER_TYPE type);
 
             template <typename T>
@@ -54,7 +56,7 @@ namespace ENGINE {
             void processMaterials();
             void processMeshes();
             
-            ProcessedMesh processMesh(const MeshData& d);
+            static ProcessedMesh* processMesh(const MeshData& d);
 
             void run(); // makamlach
             

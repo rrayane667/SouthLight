@@ -60,6 +60,7 @@ namespace RESSOURCES{
             if (line.substr(0,2) == "v "){
                 List<float> *vect = (UTILITY::NumberParser::parse(line));
                 MATH::vec3 v = vect;
+                v.x *= 0.2f;v.y *=0.2f; v.z *= 0.2f;
                 data.vertices->append(v);
                 delete vect;
                 

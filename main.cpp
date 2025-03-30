@@ -16,11 +16,11 @@ int main(int, char**){
 
     stpKhdm.addComponent<Mesh>(object);
     Mesh* mesh = dynamic_cast<Mesh*> (stpKhdm.getComponent<Mesh>(object));
-    mesh->ressource = 1;
+    mesh->ressource = 0;
     
     stpKhdm.run();
 
-    std::cout << "Hello, from Engine!\n";
+
 
     
 }

@@ -12,7 +12,7 @@ using namespace REG;
 
 
 namespace ENGINE{
-
+    
 
     Engine::Engine(RENDERER_TYPE type) : SysMan(), EvMan(), Reg(), RessMan() {
         std::cout << "CStarting Engine..." << std::endl;
@@ -28,6 +28,7 @@ namespace ENGINE{
         delete[] mesh->indices;
         mesh->vertexCount = 0;
         mesh->indexCount = 0;
+        delete mesh;
     }
 
 
@@ -43,7 +44,7 @@ namespace ENGINE{
         }
     };
 
-ProcessedMesh Engine::processMesh(const MeshData& d) {
+ProcessedMesh* Engine::processMesh(const MeshData& d) {
     std::cout << "processing " << d.name << std::endl;
 
     // Use the custom TupleHash for the unordered_map key
@@ -79,17 +80,22 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
         }
     }
 
-    ProcessedMesh result;
-    result.vertexCount = static_cast<unsigned int>(vertexBuffer.size() / 6);
-    result.indexCount = static_cast<unsigned int>(indexBuffer.size());
+    ProcessedMesh* result = new ProcessedMesh;
+    
+    result->vertexCount = static_cast<unsigned int>(vertexBuffer.size() / 6);
+    result->indexCount = static_cast<unsigned int>(indexBuffer.size());
+
 
     // Allocate and copy vertex data
-    result.vertices = new float[vertexBuffer.size()];
-    std::memcpy(result.vertices, vertexBuffer.data(), vertexBuffer.size() * sizeof(float));
+    result->vertices = new float[vertexBuffer.size()];
+    std::memcpy(result->vertices, vertexBuffer.data(), vertexBuffer.size() * sizeof(float));
 
     // Allocate and copy index data
-    result.indices = new unsigned int[indexBuffer.size()];
-    std::memcpy(result.indices, indexBuffer.data(), indexBuffer.size() * sizeof(unsigned int));
+    result->indices = new unsigned int[indexBuffer.size()];
+    std::memcpy(result->indices, indexBuffer.data(), indexBuffer.size() * sizeof(unsigned int));
+
+    //for(auto& x:vertexBuffer) std::cout << x <<std::endl;
+    //for(auto& x:indexBuffer) std::cout << x <<std::endl;
 
     std::cout << d.name << " processed" << std::endl << std::endl;
     return result;
@@ -103,18 +109,21 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
             Mesh* mesh = dynamic_cast<Mesh*>(Reg.getComponent<Mesh>(id));
             MeshData* data = dynamic_cast<MeshData*>(RessMan.getData(mesh->ressource));
             
-            ProcessedMesh processed = processMesh(*data);
+            ProcessedMesh* processed = processMesh(*data);
             
-            mesh->vao = gpu->createVertexArray();
+            gpu->createVertexArray(mesh->vao);
             gpu->bindVertexArray(mesh->vao);
     
-            mesh->vbo = gpu->createVertexBuffer(processed.vertices, processed.vertexCount * 6 * sizeof(float));
+            gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
             gpu->structBuffer(0, 3, 6, 0);
             gpu->structBuffer(1, 3, 6, 3);
             
-            mesh->ebo = gpu->createIndexBuffer(processed.indices, processed.indexCount * sizeof(unsigned int));
+            gpu->createIndexBuffer(mesh->ebo, processed->indices, processed->indexCount * sizeof(unsigned int));
+            mesh->vertex_count = processed->indexCount;
+
+            freeProcessedMesh(processed);
             
-            freeProcessedMesh(&processed);
+
         }
         
         delete entities;
@@ -131,16 +140,17 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
                 Material* mat;
                 mat = Reg.getComponent<Material>(x);
 
-                std::string vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
-                std::string frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
+                const char* vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
+                const char* frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->frag_index)))->shaderString;
 
-
-                mat->shader = gpu->createShader(vert, frag);
+                mat->shader = new unsigned int;
+                gpu->createShader(mat->shader, vert, frag);
                 mat->is_loaded = true;
 
 
             }
             catch(...){
+                std::cout << "adding default material" << std::endl;
 
                 Reg.addComponent<Material>(x);
                 (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader() ;
@@ -154,6 +164,8 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
 
 
     void Engine::onInit(){
+        std::cout <<std::endl;
+        std::cout << "Creating default material"<<std::endl;
         //default shader. will be stored in settings class
         const char* default_vert_shader = "#version 330 core\n"
                                         "layout (location = 0) in vec3 aPos;\n"
@@ -166,14 +178,29 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
                                             "out vec4 FragColor; \n"
                                             "void main()\n"
                                             "{\n"
-                                            "	FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f); \n"
+                                            "	FragColor = vec4(0.0f, 0.5f, 0.2f, 1.0f); \n"
                                             "}\n";
 
-        Settings::setDefaultShader(gpu->createShader(default_vert_shader, default_frag_shader));
+        gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
+        std::cout << " default material mcha"<<std::endl;
+
+        std::cout <<std::endl;
+        std::cout << "processing meshes"<<std::endl;
         
         processMeshes();
+
+        std::cout << "meshes tprocessaw"<<std::endl;
+
+        std::cout << "processing materials"<<std::endl;
         processMaterials();
+        std::cout <<std::endl;
+        std::cout << "materials tprocessaw"<<std::endl;
+
+        std::cout <<std::endl;
+        std::cout << "initialising all systems"<<std::endl;
         SysMan.initAllSystems(Reg);
+        std::cout << "systemes initialisé"<<std::endl;
+        std::cout <<std::endl;
     }
 
     void Engine::onStart(){
@@ -187,11 +214,17 @@ ProcessedMesh Engine::processMesh(const MeshData& d) {
     void Engine::onExit(){
 
         SysMan.shutdown(Reg);
+        std::cout << "Engine Shutting down"<<std::endl;
     }
 
     void Engine::run(){
+        std::cout <<std::endl;
+        std::cout << "Engine ki jri"<<std::endl;
+            
         onInit();
         onStart();
+        std::cout <<std::endl;
+        std::cout << "main loop"<<std::endl;
         while(gpu->windowCheck()){
             processEvents();
             onUpdate();

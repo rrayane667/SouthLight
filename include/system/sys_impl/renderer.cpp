@@ -10,6 +10,8 @@ namespace SYSTEMS{
         std::cout << "Creating Renderer"<<std::endl;
         
         gpu = GraphicsDevice::getInstance();
+        std::cout << "Renderer tsawb"<<std::endl;
+        std::cout<<std::endl;
 
         
     }   
@@ -19,15 +21,17 @@ namespace SYSTEMS{
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();
 
+        std::cout << *entities_list << std::endl;
+
         std::cout << "initialisation du Renderer"<<std::endl;
         for(auto& x:(*entities_list)){
-            unsigned int shadeur = (reg.getComponent<Material>(x))->shader ;
-            if (entities.find(shadeur) == entities.end()){
+            unsigned int* shadeur = ((reg.getComponent<Material>(x))->shader) ;
+            if (entities.find(*shadeur) == entities.end()){
 
-                entities[shadeur] = new DynamicList<int>;
+                entities[*shadeur] = new DynamicList<int>;
                 
             }
-            entities[shadeur]->append(x);
+            entities[*shadeur]->append(x);
         }
         
 
@@ -37,12 +41,15 @@ namespace SYSTEMS{
 
     void Renderer::update(REG::Registry& reg){
         for(const auto& keyvalue: entities){
+            
 
-            unsigned int shadeur = keyvalue.first;
+            
             List<int>* entite = keyvalue.second;
-            gpu->useShader(shadeur);
+            unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
+            gpu->useShader(*shadeur);
             for(const auto& x:(*entite)){
 
+                gpu->events();
                 gpu->color();
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
                 gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);

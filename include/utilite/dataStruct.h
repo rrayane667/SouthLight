@@ -82,7 +82,7 @@ namespace DATASTRUCT {
 				where << "Dynamic list : [" ;
 				for(int i =0; i<=current_index; i++){
 					
-					where << "a"; //(liste[i]) << ", ";
+					where << (liste[i]) << ", ";
 				}
 				where << "]" ;
 			}

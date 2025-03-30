@@ -29,7 +29,7 @@ namespace SYSTEMS{
         //GLFWwindow* window;
         GraphicsDevice* gpu;
 
-        std::unordered_map<int, List<int>*> entities;
+        std::unordered_map<unsigned int, List<int>*> entities;
         public:
 
             Renderer();

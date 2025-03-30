@@ -39,7 +39,9 @@ namespace REG{
     };
 
     struct Mesh : public Component{
-        inline Mesh(int index) : Component(index) {}
+        inline Mesh(int index) : Component(index) {std::cout << "Mesh component created"<<std::endl;
+            std::cout <<std::endl;}
+
         static inline std::string getComponentId()  {return "Mesh";}
         unsigned int vao;
         unsigned int vbo;
@@ -62,7 +64,7 @@ namespace REG{
         inline Material(int index) : Component(index) {}
         inline Material() : Component(-1) {}
 
-        unsigned int shader;
+        unsigned int* shader;
 
         int frag_index;
         int vert_index;

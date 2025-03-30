@@ -3,11 +3,15 @@
 namespace REG{
 
     int Registry::createEntity(){
+        std::cout << "creating entity"<<std::endl;
         hierarchy->append(3);
         addComponent<Visibilite>(hierarchy->len()-1);
         addComponent<Transform>(hierarchy->len()-1);
+        std::cout << "entity created"<<std::endl;
+        std::cout <<std::endl;
         //ajout des component dans les sparse sets correspondants
         return hierarchy->len();
+        
 
     }
 

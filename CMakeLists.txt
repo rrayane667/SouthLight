@@ -49,3 +49,9 @@ target_link_libraries(TestParse PUBLIC EngineSource catch)
 
 add_executable(TestRessource "${CMAKE_SOURCE_DIR}/testing/test_ressources.cpp")
 target_link_libraries(TestRessource PUBLIC EngineSource catch)
+
+add_executable(TestGpu "${CMAKE_SOURCE_DIR}/testing/test_gpu.cpp")
+target_link_libraries(TestGpu PUBLIC EngineSource glad ${GLFW_LIB} opengl32)
+
+add_executable(TestEngine "${CMAKE_SOURCE_DIR}/testing/test_engine.cpp")
+target_link_libraries(TestEngine PUBLIC EngineSource glad ${GLFW_LIB} opengl32)

@@ -10,7 +10,7 @@ namespace EVENTS{
     class EventManager{
         using Callback = std::function<void(const Event& event)>;
 
-        std::unordered_map<EventType,DATASTRUCT::DynamicList<Callback>> file;
+        //std::unordered_map<EventType,DATASTRUCT::DynamicList<Callback>> file;
         public:
             void subscribe(EventType type, Callback c);
             void publish(const Event& event);

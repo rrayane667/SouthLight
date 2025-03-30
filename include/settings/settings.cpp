@@ -17,7 +17,7 @@ class Settings{
         static inline RENDERER_TYPE renderer_type = GL_TYPE;
         static inline float WIDTH = 800, HEIGHT = 800;
         static inline Settings* ptr = nullptr;
-        static inline unsigned int default_shader = 0;
+        static inline unsigned int* default_shader = new unsigned int;
 
         Settings() {
 
@@ -38,11 +38,9 @@ class Settings{
             return ptr;
         }
 
-        static void setDefaultShader(unsigned int def){
-            default_shader = def;
-        }
 
-        inline static unsigned int getDefaultShader(){return default_shader;}
+
+        inline static unsigned int* getDefaultShader(){return default_shader;}
 
         static void setRenderer(RENDERER_TYPE r) {
             renderer_type = r;
