@@ -127,6 +127,7 @@ namespace MATH {
 		vec4();
 		vec4(const float& x, const float& y, const float& z, const float& w);
 
+
 		vec4& add(const vec4& v);
 		vec4& sub(const vec4& v);
 		vec4& multi(const vec4& v);
@@ -200,10 +201,13 @@ namespace MATH {
 		mat4& sub(const mat4& m);
 		mat4& multi(const mat4& m);
 
+		
+
 		mat4 transpose();
-		static mat4 rotation(const vec4& axis, const float& angle);
+		static mat4 rotation(vec4& axis, const float& angle);
 		static mat4 translation(const vec3& t);
 		static mat4 view(vec4 camera, vec4 center, vec4 up);
+		static mat4 scale(const vec3& v);
 
 		mat4 operator+(mat4 v);
 		mat4 operator-(mat4 v);

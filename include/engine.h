@@ -52,6 +52,8 @@ namespace ENGINE {
 
             inline void addSystem(SYSTEM s){return SysMan.addSystem(s);}
 
+            inline void setScale(float& x, float& y, float& z);
+
             void processEvents();
             void processMaterials();
             void processMeshes();

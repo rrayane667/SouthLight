@@ -36,6 +36,8 @@ namespace REG{
         void aff(std::ostream& o) override { 
             o << "Transform : position =" << position << "rotation = " << rotation << "scale = " << scale ;
         }
+        mat4 model;
+
     };
 
     struct Mesh : public Component{
@@ -75,6 +77,17 @@ namespace REG{
             o << "Material : " << shader;
         }
     };
+
+    typedef enum c{
+        PERSPECTIVE,
+        ORTHOGRAPHIQUE
+    } ProjectionType;
+
+    struct Camera : public Component{
+        ProjectionType projection;
+    };
+
+    
 
     
 }

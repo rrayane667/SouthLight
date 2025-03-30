@@ -40,11 +40,12 @@ int main(){
     gpu->structBuffer(1, 3, 6, 3);
 
     const char* vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
+                                        "layout (location = 0) in vec3 aPos;\n"
+                                        "uniform mat4 model;\n"
+                                        "void main()\n"
+                                        "{\n"
+                                        "   gl_Position = model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                        "}\0";
 
     const char* fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor; \n"
@@ -59,6 +60,7 @@ int main(){
 
     // Main render loop
     while (gpu->windowCheck()) {
+        gpu->setUniform(shaderProgram, "model", mat4::scale(vec3(1.0f,1.0f,1.0f)).list);
         // Process input and events (for example, close window on ESC key)
         gpu->events();
 

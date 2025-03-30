@@ -13,6 +13,10 @@ namespace SYSTEMS{
         System* sys = new Renderer;
         systems.append(sys);
     }
+    if(s==TRANSFORM){
+        System* sys = new Transformer;
+        systems.append(sys);
+    }
     
    }
 

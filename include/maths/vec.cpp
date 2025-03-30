@@ -533,7 +533,7 @@ namespace MATH {
 
 	mat4 mat4::perspective(const float& fov, const float& aspect, const float& near, const float& far) {
 		float tanHalfFov = tan(fov);
-		printf("tan fov : %f \n", tanHalfFov);
+		//printf("tan fov : %f \n", tanHalfFov);
 		mat4 result = mat4();
 		result.c1.x = 1.0 / (aspect * tanHalfFov);
 		result.c2.y = 1.0 / tanHalfFov;
@@ -586,6 +586,28 @@ namespace MATH {
 
 		return trans;
 	}
+	
+	mat4 mat4::rotation(vec4& axis, const float& angle) {
+		vec4 normAxis = axis.normalize();
+		float cosA = cos(angle);
+		float sinA = sin(angle);
+		float oneMinusCosA = 1.0f - cosA;
+		
+		float x = normAxis.x;
+		float y = normAxis.y;
+		float z = normAxis.z;
+		
+		return mat4(
+			cosA + x * x * oneMinusCosA,       x * y * oneMinusCosA - z * sinA, x * z * oneMinusCosA + y * sinA, 0,
+			y * x * oneMinusCosA + z * sinA, cosA + y * y * oneMinusCosA,       y * z * oneMinusCosA - x * sinA, 0,
+			z * x * oneMinusCosA - y * sinA, z * y * oneMinusCosA + x * sinA, cosA + z * z * oneMinusCosA,       0,
+			0,                               0,                               0,                               1
+		);
+	}
+
+	mat4 mat4::scale(const vec3& v){
+		return diag(vec4(v.x, v.y, v.z, 1.0f));
+	}
 
 	mat4& mat4::add(const mat4& m) {
 		c1 += m.c1;
@@ -602,12 +624,16 @@ namespace MATH {
 		return *this;
 	}
 	mat4& mat4::multi(const mat4& v) {
-		c1 -= (*this).vecMulti(v.c1);
-		c2 -= (*this).vecMulti(v.c2);
-		c3 -= (*this).vecMulti(v.c3);
-		c4 -= (*this).vecMulti(v.c4);
+		vec4 newC1 = vecMulti(v.c1); // Replace with correct column computation
+		vec4 newC2 = vecMulti(v.c2);
+		vec4 newC3 = vecMulti(v.c3);
+		vec4 newC4 = vecMulti(v.c4);
+		c1 = newC1; 
+		c2 = newC2; 
+		c3 = newC3; 
+		c4 = newC4;
 		return *this;
-	}
+	  }
 
 	mat4 mat4::operator+(mat4 v) {
 		return v.add(*this);

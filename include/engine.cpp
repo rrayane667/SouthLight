@@ -169,16 +169,19 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
         //default shader. will be stored in settings class
         const char* default_vert_shader = "#version 330 core\n"
                                         "layout (location = 0) in vec3 aPos;\n"
+                                        "uniform mat4 model;\n"
+                                        "uniform mat4 projection;\n"
+                                        "uniform mat4 view;\n"
                                         "void main()\n"
                                         "{\n"
-                                        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                        "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                         "}\0";
 
         const char* default_frag_shader = "#version 330 core\n"
                                             "out vec4 FragColor; \n"
                                             "void main()\n"
                                             "{\n"
-                                            "	FragColor = vec4(0.0f, 0.5f, 0.2f, 1.0f); \n"
+                                            "	FragColor = vec4(0.168f, 0.112f, 0.255f, 1.0f); \n"
                                             "}\n";
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
@@ -201,6 +204,10 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
         SysMan.initAllSystems(Reg);
         std::cout << "systemes initialisé"<<std::endl;
         std::cout <<std::endl;
+    }
+
+    void Engine::setScale(float& x, float& y, float& z){
+
     }
 
     void Engine::onStart(){

@@ -40,15 +40,26 @@ namespace SYSTEMS{
 
 
     void Renderer::update(REG::Registry& reg){
+        mat4 projection = mat4::perspective(0.785, 800.0f / 600.0f, 0.1f, 100);
+		    mat4 view = mat4::view(
+			    vec4(0.0f, 0.0f, 1.0f, 1.0f), // Correct w = 1.0f for position
+			    vec4(0.0f, 0.0f, 0.0f, 1.0f), // Correct w = 1.0f for position
+			    vec4(0.0f, 1.0f, 0.0f, 0.0f)  // Correct w = 0.0f for direction
+            );
         for(const auto& keyvalue: entities){
             
-
             
             List<int>* entite = keyvalue.second;
             unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
             gpu->useShader(*shadeur);
+
+            gpu->setUniform(*shadeur, "projection", projection.list);
+            gpu->setUniform(*shadeur, "view", view.list);
+
             for(const auto& x:(*entite)){
 
+
+                gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
                 gpu->events();
                 gpu->color();
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);

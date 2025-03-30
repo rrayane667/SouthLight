@@ -1,7 +1,6 @@
 #pragma once
 #include "system/system.h"
 
-using namespace SYSTEMS;
 
 namespace EVENTS{
 

@@ -171,7 +171,7 @@ namespace GPU{
     }
 
     void GL_GraphicsDevice::color(){
-        glClearColor(0.168f, 0.112f, 0.255f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		glClear(GL_COLOR_BUFFER_BIT);
     }

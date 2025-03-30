@@ -3,6 +3,7 @@
 #include "gpu/gpu.h"
 #include <unordered_map>
 #include <iostream>
+#include "eventmanager/event.h"
 
 using namespace REG;
 using namespace GPU;
@@ -23,6 +24,34 @@ namespace SYSTEMS{
                 return o;
             }
     };
+
+    class Transformer : public System {
+        public:
+            Transformer() = default;
+            ~Transformer() = default;
+        
+
+            void onInit(REG::Registry& reg) override;
+            inline void onStart(REG::Registry& reg) override {};
+            inline void update(REG::Registry& reg) override {};
+            inline void ondestroy() override{};
+            inline int getId() override {return 1;};
+
+            inline vec3 getPosition(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->position;}
+            inline vec3 getRotation(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->rotation;}
+            inline vec3 getScale(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->scale;}
+
+            void setPosition(REG::Registry& reg, int entity, const vec3& v);
+            void setRotation(REG::Registry& reg, int entity, const vec3& v);
+            void setScale(REG::Registry& reg, int entity, const vec3& v);
+        
+        private:
+            //callback pour event manager
+            //void onTransformUpdated(const Event& event);
+            void updateMatrix(REG::Registry& reg, int& x);
+        
+
+        };
 
 
     class Renderer : public System{
@@ -47,6 +76,7 @@ namespace SYSTEMS{
 
     typedef enum sys{
         RENDERER,
+        TRANSFORM,
         PHYSICS,
         COLLISION
     } SYSTEM;
