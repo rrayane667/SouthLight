@@ -28,10 +28,10 @@ namespace REG{
     };
 
     struct Transform : public Component{
-        inline Transform(int index) : Component(index) {}
+        inline Transform(int index) : Component(index) {scale = vec3(0.2f, 0.2f, 0.2f);}
         static inline std::string getComponentId()  {return "Transform";}
-        vec3 position;
-        vec3 rotation;
+        vec3 position = vec3(0.0f, 0.0f, 0.0f);
+        vec3 rotation = vec3(0.0f, 0.0f, 0.0f);
         vec3 scale;
         void aff(std::ostream& o) override { 
             o << "Transform : position =" << position << "rotation = " << rotation << "scale = " << scale ;
@@ -41,8 +41,7 @@ namespace REG{
     };
 
     struct Mesh : public Component{
-        inline Mesh(int index) : Component(index) {std::cout << "Mesh component created"<<std::endl;
-            std::cout <<std::endl;}
+        inline Mesh(int index) : Component(index) {}
 
         static inline std::string getComponentId()  {return "Mesh";}
         unsigned int vao;
@@ -84,7 +83,7 @@ namespace REG{
     } ProjectionType;
 
     struct CameraPerspective{
-        float fov = 0.785, ratio = 800.0f / 600.0f, n = 0.1f, f=100;
+        float fov = 0.9f, ratio = 800.0f / 600.0f, n = 0.1f, f=100;
     };
     struct CameraOrthographique{
         float r=0, l=0, n=0, t=0, b=0, f=0;

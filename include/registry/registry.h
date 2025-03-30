@@ -75,7 +75,7 @@ namespace REG{
 
         SparseSet<Component *>& ss = (*compReg)[T::getComponentId()];
         for(int i = 0; i<ss.getSparseLen();i++){
-            if (ss.getIndex(i)!=-1){l->append(i++);}
+            if (ss.getIndex(i)!=-1){l->append(i);}
         }
 
         if(!(l->len())) return nullptr;

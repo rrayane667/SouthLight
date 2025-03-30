@@ -45,6 +45,7 @@ namespace GPU{
 
         //viewport dimensions
         glViewport(0,0, Settings::getWidth(), Settings::getHeight());
+        glEnable(GL_DEPTH_TEST);
         std::cout << "opengl t9ad" << std::endl;
         std::cout << std::endl;
     }
@@ -173,7 +174,7 @@ namespace GPU{
     void GL_GraphicsDevice::color(){
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     void GL_GraphicsDevice::swapBuffers(){

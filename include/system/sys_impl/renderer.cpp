@@ -23,7 +23,7 @@ namespace SYSTEMS{
         cam = reg.getComponent<Camera>( reg.getEntities<Camera>()->get(0));
         camTrans = reg.getComponent<Transform>( reg.getEntities<Camera>()->get(0));
 
-        std::cout << *entities_list << std::endl;
+        //std::cout << *entities_list << std::endl;
 
         std::cout << "initialisation du Renderer"<<std::endl;
         for(auto& x:(*entities_list)){
@@ -60,20 +60,21 @@ namespace SYSTEMS{
 
             gpu->setUniform(*shadeur, "projection", projection.list);
             gpu->setUniform(*shadeur, "view", view.list);
-
+            gpu->color();
             for(const auto& x:(*entite)){
 
 
                 gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
                 gpu->events();
-                gpu->color();
+                
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
                 gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
-                gpu->swapBuffers();
+                
                 
 
 
             }
+            gpu->swapBuffers();
 
         }
     }

@@ -45,7 +45,7 @@ namespace ENGINE{
     };
 
 ProcessedMesh* Engine::processMesh(const MeshData& d) {
-    std::cout << "processing " << d.name << std::endl;
+
 
     // Use the custom TupleHash for the unordered_map key
     std::unordered_map<std::tuple<float, float, float, float, float, float>, unsigned int, TupleHash> vertexMap;
@@ -97,7 +97,6 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
     //for(auto& x:vertexBuffer) std::cout << x <<std::endl;
     //for(auto& x:indexBuffer) std::cout << x <<std::endl;
 
-    std::cout << d.name << " processed" << std::endl << std::endl;
     return result;
 }
     
@@ -130,7 +129,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
     }
 
     void Engine::processMaterials(){
-        std::cout << " Compiling shaders...";
+
         List<int>* entities_list = Reg.getEntities<Mesh>();
 
         for(auto& x:(*entities_list)){
@@ -150,7 +149,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
             }
             catch(...){
-                std::cout << "adding default material" << std::endl;
+
 
                 Reg.addComponent<Material>(x);
                 (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader() ;
@@ -169,19 +168,26 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
         //default shader. will be stored in settings class
         const char* default_vert_shader = "#version 330 core\n"
                                         "layout (location = 0) in vec3 aPos;\n"
+                                        "layout (location = 1) in vec3 n;\n"
+                                        "out float light;\n"
                                         "uniform mat4 model;\n"
                                         "uniform mat4 projection;\n"
                                         "uniform mat4 view;\n"
                                         "void main()\n"
                                         "{\n"
+                                        "   light = dot(n, -1*normalize((model*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz)) ;\n"
+                                        "   if(light<0){\n"
+                                        "       light = 0;\n"
+                                        "   }\n"
                                         "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
                                         "}\0";
 
         const char* default_frag_shader = "#version 330 core\n"
+                                            "in float light;\n"
                                             "out vec4 FragColor; \n"
                                             "void main()\n"
                                             "{\n"
-                                            "	FragColor = vec4(0.168f, 0.112f, 0.255f, 1.0f); \n"
+                                            "	FragColor = vec4(1.0f*light, 0.0f*light, 1.0f*light, 1.0f); \n"
                                             "}\n";
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
@@ -194,6 +200,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
         std::cout << "meshes tprocessaw"<<std::endl;
 
+        std::cout << " Compiling shaders...";
         std::cout << "processing materials"<<std::endl;
         processMaterials();
         std::cout <<std::endl;

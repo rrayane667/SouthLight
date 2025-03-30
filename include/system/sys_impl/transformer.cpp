@@ -4,9 +4,8 @@ namespace SYSTEMS{
 
     void Transformer::onInit(REG::Registry& reg){
         List<int>* entities_list = reg.getEntities<Transform>();
-        std::cout << *entities_list << std::endl;
+        //std::cout << *entities_list << std::endl;
 
-        std::cout << "construction des matrices modeles"<<std::endl;
         for(auto& x:(*entities_list)){
             updateMatrix(reg, x);
         }
