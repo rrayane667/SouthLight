@@ -21,6 +21,9 @@ namespace REG{
             int createEntity();
             void destroyEntity(int entity_id);
 
+            template <typename T>
+            inline bool hasComponent(int entity){return ((*compReg).find(T::getComponentId()) != compReg->end()) && (*compReg).find(T::getComponentId()).getIndex(entity);}
+
             inline int entitiesCount() const{return hierarchy->len();}
 
             //checks if the entity exists
