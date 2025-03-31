@@ -37,7 +37,7 @@ namespace ENGINE{
         std::size_t operator()(const Tuple& tuple) const {
             return std::apply([](auto&&... args) -> std::size_t {
                 std::size_t seed = 0;
-                // Combine each element's hash into one seed value
+              
                 ((seed ^= std::hash<std::decay_t<decltype(args)>>{}(args) + 0x9e3779b9 + (seed << 6) + (seed >> 2)), ...);
                 return seed;
             }, tuple);
@@ -47,7 +47,7 @@ namespace ENGINE{
 ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
 
-    // Use the custom TupleHash for the unordered_map key
+  
     std::unordered_map<std::tuple<float, float, float, float, float, float>, unsigned int, TupleHash> vertexMap;
     std::vector<float> vertexBuffer;
     std::vector<unsigned int> indexBuffer;
@@ -64,7 +64,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
         auto it = vertexMap.find(key);
         if (it == vertexMap.end()) {
-            // New unique vertex, add to map and vertex buffer
+            
             vertexMap[key] = currentIndex;
             vertexBuffer.push_back(v.x);
             vertexBuffer.push_back(v.y);
@@ -75,7 +75,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
             indexBuffer.push_back(currentIndex);
             ++currentIndex;
         } else {
-            // Existing vertex, reuse index
+           
             indexBuffer.push_back(it->second);
         }
     }

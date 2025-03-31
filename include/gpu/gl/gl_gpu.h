@@ -52,9 +52,12 @@ namespace GPU{
         // ---- Draw Calls ----
         void drawIndexed(unsigned int count) override;
         void drawArrays(unsigned int count) override;
+        void drawInstanced(unsigned int& count, unsigned int& instance_nbr) override;
 
         void color() override;
         void swapBuffers() override;
+
+
 
         void events() override;
         bool windowCheck() override;

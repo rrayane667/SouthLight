@@ -10,7 +10,7 @@ int main(int, char**){
 
     Engine stpKhdm(GL_TYPE);
 
-    stpKhdm.addSystem(TRANSFORM);
+    stpKhdm.addSystem(TRANSFORMER);
     stpKhdm.addSystem(RENDERER);
 
     for(int i = 0; i < 10; i++) {

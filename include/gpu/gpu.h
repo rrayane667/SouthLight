@@ -57,6 +57,7 @@ namespace GPU{
         virtual void drawIndexed(unsigned int count) = 0;
         virtual void drawArrays(unsigned int count) = 0;
         virtual void swapBuffers() = 0;
+        virtual void drawInstanced(unsigned int& count, unsigned int& instance_nbr) = 0;
 
         // ---- arriere plan ----
         virtual void color() = 0;

@@ -138,6 +138,11 @@ namespace GPU{
         glDrawArrays(GL_TRIANGLES, 0, count);
     }
 
+    void GL_GraphicsDevice::drawInstanced(unsigned int& count, unsigned int& instance_nbr){
+        glDrawArraysInstanced(	GL_TRIANGLES, 0, count, instance_nbr);
+       
+    }
+
     void GL_GraphicsDevice::createShader(unsigned int* shaderProgram, const char* vertexCode, const char* fragmentCode) {
         unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
@@ -172,7 +177,7 @@ namespace GPU{
     }
 
     void GL_GraphicsDevice::color(){
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }

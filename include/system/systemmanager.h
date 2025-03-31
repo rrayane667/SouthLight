@@ -2,12 +2,13 @@
 #include "utilite/dataStruct.h"
 #include "system.h"
 #include "registry/registry.h"
+#include <unordered_map>
 using namespace DATASTRUCT;
 
 namespace SYSTEMS{
     class SystemManager{
         DynamicList<System*> systems;
-        unordered_map<SYSTEM, System*> systems_map;
+        std::unordered_map<SYSTEM, System*> systems_map;
         public:
             inline SystemManager() {std::cout << "System manager constructed" << std::endl;std::cout << std::endl;};
             void addSystem(System* s);

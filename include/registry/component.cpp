@@ -2,8 +2,9 @@
 #include "maths/vec.h"
 #include <string>
 #include <iostream>
+#include "utilite/dataStruct.h"
 
-
+using namespace DATASTRUCT;
 using namespace MATH;
 
 namespace REG{
@@ -25,7 +26,7 @@ namespace REG{
             o<<"Instances : "<< *instances<<std::endl;
         }
         static inline std::string getComponentId(){return "Instances";}
-    }
+    };
 
     struct Visibilite : public Component{
         inline Visibilite(int index) : Component(index) {}

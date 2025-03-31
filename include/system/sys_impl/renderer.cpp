@@ -40,17 +40,30 @@ namespace SYSTEMS{
         
     }
 
+    void Renderer::onStart(REG::Registry& reg){
+        for(const auto& keyvalue: entities){
+            mat4 projection;
+            if (cam->projection == PERSPECTIVE) projection = mat4::perspective(cam->cp->fov, cam->cp->ratio,cam->cp->n ,cam->cp->f );
+            else projection = mat4::orthographic(cam->co->r, cam->co->l, cam->co->t, cam->co->b, cam->co->n, cam->co->f);
+            
+            mat4 view = mat4::view(
+                vec4(0.0f, 0.0f, 1.0f, 1.0f), 
+                vec4(camTrans->position.x, camTrans->position.y, camTrans->position.z, 1.0f), 
+                vec4(0.0f, 1.0f, 0.0f, 0.0f)  
+            );
+            
+            List<int>* entite = keyvalue.second;
+            unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
+            gpu->useShader(*shadeur);
+            
+            gpu->setUniform(*shadeur, "projection", projection.list);
+            gpu->setUniform(*shadeur, "view", view.list);
+        }
+    }
+
 
     void Renderer::update(REG::Registry& reg){
-        mat4 projection;
-        if (cam->projection == PERSPECTIVE) projection = mat4::perspective(cam->cp->fov, cam->cp->ratio,cam->cp->n ,cam->cp->f );
-        else projection = mat4::orthographic(cam->co->r, cam->co->l, cam->co->t, cam->co->b, cam->co->n, cam->co->f);
         
-		    mat4 view = mat4::view(
-			    vec4(0.0f, 0.0f, 1.0f, 1.0f), 
-			    vec4(camTrans->position.x, camTrans->position.y, camTrans->position.z, 1.0f), 
-			    vec4(0.0f, 1.0f, 0.0f, 0.0f)  
-            );
         for(const auto& keyvalue: entities){
             
             
@@ -58,8 +71,6 @@ namespace SYSTEMS{
             unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
             gpu->useShader(*shadeur);
 
-            gpu->setUniform(*shadeur, "projection", projection.list);
-            gpu->setUniform(*shadeur, "view", view.list);
             gpu->color();
             for(const auto& x:(*entite)){
 

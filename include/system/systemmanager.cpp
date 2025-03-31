@@ -19,7 +19,7 @@ namespace SYSTEMS{
         systems.append(sys);
         systems_map[s] = sys;
     }
-    if(s==TRANSFORM){
+    if(s==TRANSFORMER){
         System* sys = new Transformer;
         systems.append(sys);
     }

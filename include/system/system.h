@@ -12,7 +12,7 @@ namespace SYSTEMS{
     typedef enum sys{
         INSTANCEUR,
         RENDERER,
-        TRANSFORM,
+        TRANSFORMER,
         PHYSICS,
         COLLISION
     } SYSTEM;
@@ -89,7 +89,7 @@ namespace SYSTEMS{
 
 
             void onInit(REG::Registry& reg) override;
-            inline void onStart(REG::Registry& reg) {}
+            void onStart(REG::Registry& reg);
             void update(REG::Registry& reg) override;
             inline void ondestroy() {}
 

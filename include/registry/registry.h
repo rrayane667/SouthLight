@@ -91,7 +91,7 @@ namespace REG{
         if(compReg->find(T::getComponentId()) == compReg->end()){
             (*compReg)[T::getComponentId()] = SparseSet<Component*>();
         }
-        if((*compReg)[T::getComponentId()].getIndex(entity) !=-1) return;
+        if((*compReg)[T::getComponentId()].getIndex(entity_id) !=-1) return;
         (*compReg)[T::getComponentId()].set(entity_id,new T(total_nbr++));
     }
 
@@ -115,4 +115,3 @@ namespace REG{
 
     }
 }
-

@@ -8,7 +8,7 @@ namespace REG{
         addComponent<Visibilite>(hierarchy->len());
         addComponent<Transform>(hierarchy->len());
 
-        std::cout <<std::endl;
+
         //ajout des component dans les sparse sets correspondants
         return hierarchy->len();
         
