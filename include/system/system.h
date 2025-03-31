@@ -24,7 +24,7 @@ namespace SYSTEMS{
             virtual void update(REG::Registry& reg) = 0;
             virtual void ondestroy() = 0;
 
-            virtual SYSTEMS getId() = 0;
+            virtual SYSTEM getId() = 0;
 
             friend std::ostream& operator<<(std::ostream& o, System& s){
                 o << s.getId();
@@ -37,7 +37,7 @@ namespace SYSTEMS{
             inline void onStart(REG::Registry& reg) override{}
             inline void update(REG::Registry& reg) override {}
             inline void ondestroy() override {}
-            inline SYSTEMS getId() {return INSTANCEUR;}
+            inline SYSTEM getId() {return INSTANCEUR;}
 
             inline void instance(REG::Registry& reg, int entity){
                 reg.addComponent<Instances>(entity);
@@ -56,7 +56,7 @@ namespace SYSTEMS{
             inline void onStart(REG::Registry& reg) override {};
             inline void update(REG::Registry& reg) override {};
             inline void ondestroy() override{};
-            inline SYSTEMS getId() override {return TRANSFORMER;};
+            inline SYSTEM getId() override {return TRANSFORMER;};
 
             inline vec3 getPosition(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->position;}
             inline vec3 getRotation(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->rotation;}
@@ -93,7 +93,7 @@ namespace SYSTEMS{
             void update(REG::Registry& reg) override;
             inline void ondestroy() {}
 
-            inline SYSTEMS getId() override{return RENDERER;}
+            inline SYSTEM getId() override{return RENDERER;}
     };
 
 
