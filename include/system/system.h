@@ -91,6 +91,7 @@ namespace SYSTEMS{
 
 
     typedef enum sys{
+        INSTANCEUR,
         RENDERER,
         TRANSFORM,
         PHYSICS,
