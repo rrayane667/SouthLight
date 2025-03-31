@@ -5,13 +5,19 @@ using namespace DATASTRUCT;
 
 namespace SYSTEMS{
    void SystemManager::addSystem(System* s){
+    SYSTEM t = s->getId();
+    if(systems_map.find(t) != systems_map.end()) return;
     systems.append(s);
+    systems_map[t] = s;
+      
    }
 
    void SystemManager::addSystem(SYSTEM s){
+      if(systems_map.find(s) != systems_map.end()) return;
     if(s== RENDERER){
         System* sys = new Renderer;
         systems.append(sys);
+        systems_map[s] = sys;
     }
     if(s==TRANSFORM){
         System* sys = new Transformer;
