@@ -24,6 +24,20 @@ namespace SYSTEMS{
                 return o;
             }
     };
+    class Instanceur : public System{
+        public:
+            inline void onInit(REG::Registry& reg) override {}
+            inline void onStart(REG::Registry& reg) override{}
+            inline void update(REG::Registry& reg) override {}
+            inline void ondestroy() override {}
+            inline int getId() {return 2;}
+
+            inline void instance(REG::Registry& reg, int entity){
+                reg.addComponent<Instances>(entity);
+                Instances* inst = dynamic_cast<Instances*> (reg.getComponent<Instances>(entity));
+                inst->instances->append(reg.createEntity());
+            }
+    };
 
     class Transformer : public System {
         public:
