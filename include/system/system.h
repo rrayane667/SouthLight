@@ -33,6 +33,7 @@ namespace SYSTEMS{
     };
     class Instanceur : public System{
         public:
+            Instanceur(){std::cout << "INSTANCIATION INSTANCEE"<<std::endl;}
             inline void onInit(REG::Registry& reg) override {}
             inline void onStart(REG::Registry& reg) override{}
             inline void update(REG::Registry& reg) override {}
@@ -41,14 +42,17 @@ namespace SYSTEMS{
 
             inline void instance(REG::Registry& reg, int entity){
                 reg.addComponent<Instances>(entity);
+                
                 Instances* inst = dynamic_cast<Instances*> (reg.getComponent<Instances>(entity));
+
                 inst->instances->append(reg.createEntity());
+
             }
     };
 
     class Transformer : public System {
         public:
-            Transformer() = default;
+            Transformer() {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;};
             ~Transformer() = default;
         
 

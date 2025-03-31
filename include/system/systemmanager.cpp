@@ -23,6 +23,11 @@ namespace SYSTEMS{
         System* sys = new Transformer;
         systems.append(sys);
     }
+    if(s==INSTANCEUR){
+        System* sys = new Instanceur;
+        systems.append(sys);
+    }
+
     
    }
 

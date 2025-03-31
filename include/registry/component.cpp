@@ -20,8 +20,9 @@ namespace REG{
     };
 
     struct Instances : public Component{
+        unsigned int instanceBuffer; //contains transform info
         List<int>* instances;
-        inline Instances(int index) : Component(index), instances() {}
+        inline Instances(int index) : Component(index) {instances = new DynamicList<int>;}
         inline void aff(std::ostream& o) override{
             o<<"Instances : "<< *instances<<std::endl;
         }

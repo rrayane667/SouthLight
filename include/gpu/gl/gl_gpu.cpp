@@ -55,7 +55,7 @@ namespace GPU{
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+	    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
 
     }
 
@@ -69,6 +69,10 @@ namespace GPU{
     void GL_GraphicsDevice::structBuffer(unsigned int channel, int dimension, int stride, int start){
         glVertexAttribPointer(channel, dimension, GL_FLOAT, GL_FALSE, stride*sizeof(float), (void*)(start * sizeof(float)));
         glEnableVertexAttribArray(channel);
+    }
+
+    void GL_GraphicsDevice::instanceDiviseur(int channel, int count){
+        glVertexAttribDivisor(channel, count);
     }
     
     void GL_GraphicsDevice::updateBuffer(unsigned int& bufferID, const void* data, size_t size) {
@@ -138,8 +142,8 @@ namespace GPU{
         glDrawArrays(GL_TRIANGLES, 0, count);
     }
 
-    void GL_GraphicsDevice::drawInstanced(unsigned int& count, unsigned int& instance_nbr){
-        glDrawArraysInstanced(	GL_TRIANGLES, 0, count, instance_nbr);
+    void GL_GraphicsDevice::drawInstanced(unsigned int count, unsigned int instance_nbr){
+        glDrawElementsInstanced(GL_TRIANGLES, count, GL_UNSIGNED_INT,nullptr,instance_nbr);
        
     }
 
