@@ -18,6 +18,15 @@ namespace REG{
 
     };
 
+    struct Instances : public Component{
+        List<int>* instances;
+        inline Instances(int index) : Component(index), instances() {}
+        inline void aff(std::ostream& o) override{
+            o<<"Instances : "<< *instances<<std::endl;
+        }
+        static inline std::string getComponentId(){return "Instances";}
+    }
+
     struct Visibilite : public Component{
         inline Visibilite(int index) : Component(index) {}
         static inline std::string getComponentId()  {return "Visibilite";}
