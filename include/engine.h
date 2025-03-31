@@ -50,6 +50,8 @@ namespace ENGINE {
 
             inline int createEntity(){return Reg.createEntity();}
 
+            void duplicate(int entity);
+
             inline void addSystem(SYSTEM s){return SysMan.addSystem(s);}
 
             inline void setScale(float& x, float& y, float& z);
