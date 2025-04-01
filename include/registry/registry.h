@@ -22,7 +22,7 @@ namespace REG{
             void destroyEntity(int entity_id);
 
             template <typename T>
-            inline bool hasComponent(int entity){return ((*compReg).find(T::getComponentId()) != compReg->end()) && (*compReg).find(T::getComponentId()).getIndex(entity);}
+            inline bool hasComponent(int entity){return ((*compReg).find(T::getComponentId()) != compReg->end()) && ((*compReg)[T::getComponentId()].getIndex(entity)!=-1);}
 
             inline int entitiesCount() const{return hierarchy->len();}
 
