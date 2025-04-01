@@ -8,7 +8,7 @@ namespace RESSOURCES{
         vertices = new DynamicList<MATH::vec3>(dynamic_cast<DynamicList<MATH::vec3>*>(m_data.vertices));
         UV = new DynamicList<MATH::vec2>(dynamic_cast<DynamicList<MATH::vec2>*>(m_data.UV));
         normals = new DynamicList<MATH::vec3>(dynamic_cast<DynamicList<MATH::vec3>*>(m_data.normals));
-        faces = new DynamicList<paire<float, float>>(dynamic_cast<DynamicList<paire<float, float>>*>(m_data.faces));
+        faces = new DynamicList<float>(  dynamic_cast<DynamicList<float>*>  (m_data.faces));
     }
 
     MeshData::MeshData() {
@@ -16,7 +16,7 @@ namespace RESSOURCES{
         vertices = new DynamicList<MATH::vec3>;
         UV = new DynamicList<MATH::vec2>;
         normals = new DynamicList<MATH::vec3>;
-        faces = new DynamicList<paire<float, float>>;
+        faces = new DynamicList<float>;
     }
 
     MeshData* MeshData::clone() const{

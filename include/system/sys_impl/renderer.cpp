@@ -80,6 +80,10 @@ namespace SYSTEMS{
                 gpu->events();
                 
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
+                for(auto& x: reg.getComponent<Material>(entite->get(0))->tex_components ){
+                    gpu->bindTexture(*x.second, 0);
+                }
+                
 
                 if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len());
                 else{

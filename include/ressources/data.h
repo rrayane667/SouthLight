@@ -2,6 +2,8 @@
 #include "utilite/dataStruct.h"
 #include "maths/vec.h"
 
+#include "stb_image.h"
+
 using namespace DATASTRUCT;
 
 namespace RESSOURCES
@@ -31,7 +33,7 @@ namespace RESSOURCES
         List<MATH::vec3> *vertices;
         List<MATH::vec2> *UV;
         List<MATH::vec3> *normals;
-        List<paire<float, float>> *faces;
+        List<float> *faces;
 
         int object_ressource_index;
 
@@ -40,12 +42,26 @@ namespace RESSOURCES
     };
 
     struct ShaderData : public Data{
+        inline ShaderData(){ shaderString = nullptr;test = "test";}
         inline ShaderData(const ShaderData& sd){shaderString =sd.shaderString;}
         inline Data* clone() const override{
             ShaderData* sd = new ShaderData(*this);
             return sd;
         }
+        std::string test;
         const char* shaderString;
+    };
+
+    struct TextureData : public Data{
+        inline TextureData() {data = nullptr;}
+        inline TextureData(const TextureData& td) {data = td.data;}
+        inline ~TextureData() override {stbi_image_free(data);}
+        inline Data* clone() const override{
+            TextureData* td = new TextureData(*this);
+            return td;
+        }
+        unsigned char* data ;
+        int width, height, nrchannels;
     };
 
 

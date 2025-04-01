@@ -18,39 +18,25 @@ int main(int, char**){
     int object = stpKhdm.createEntity();
     stpKhdm.addComponent<Mesh>(object);
     Mesh* mesh = dynamic_cast<Mesh*>(stpKhdm.getComponent<Mesh>(object));
-    mesh->ressource = 0;
+    mesh->ressource = 9;
+
     Transform* t = dynamic_cast<Transform*>(stpKhdm.getComponent<Transform>(object));
     t->scale = vec3(1.0f, 1.0f, 1.0f);
     t->position = vec3(
         0,  
-        0,  
-        0   
+        -2,  
+        20   
     );
-    
+    stpKhdm.addComponent<Material>(object);
+    Material* mat = dynamic_cast<Material*>(stpKhdm.getComponent<Material>(object));
+    mat->frag_index = 6;
+    mat->vert_index = 7;
+    unsigned int txtre = 8;
 
-    for(int i = 0; i < 20; i++) {
-        for(int j = 0; j < 20; j++) {
-            for(int k = 0; k < 20; k++) {
+    mat->tex_components["a"] = &txtre;
 
-                stpKhdm.duplicate(object, vec3(
-                    150.0f * i/19 - 75.5f,  
-                    150.0f * j/19 - 75.5f,  
-                    10.0f + 100.0f * k/19  
-                ));
-                
-                
-            }
-        }
-    }
-    std::cout<<"TEST"<<std::endl;
 
-    //t->rotation = vec3(0.0f,0.0f,1.5f);
     stpKhdm.addComponent<Camera>(stpKhdm.createEntity());
-
-    
     stpKhdm.run();
 
-
-
-    
 }

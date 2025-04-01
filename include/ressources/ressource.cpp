@@ -14,7 +14,9 @@ namespace RESSOURCES{
     }
 
     void Ressource::load(){
+
         if(!is_loaded){loader->load(path, data, type_variant); is_loaded = true;}
+
     }
 
     void Ressource::unload() {

@@ -60,6 +60,7 @@ namespace ENGINE {
             void processMaterials();
             void processMeshes();
             void processInstances();
+            void processTextures();
             
             static ProcessedMesh* processMesh(const MeshData& d);
 

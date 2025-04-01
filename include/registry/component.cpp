@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "utilite/dataStruct.h"
+#include <unordered_map>
 
 using namespace DATASTRUCT;
 using namespace MATH;
@@ -72,11 +73,14 @@ namespace REG{
  
 
     struct Material : public Component {
-        static inline std::string getComponentId()  {return "Material";}
-        inline Material(int index) : Component(index) {}
-        inline Material() : Component(-1) {}
+        static inline std::string getComponentId()  { return "Material";}
+        inline Material(int index) : Component(index) {is_loaded=false;}
+        inline Material() : Component(-1) {is_loaded=false;}
 
         unsigned int* shader;
+
+        std::unordered_map<std::string, float> float_components;
+        std::unordered_map<std::string, unsigned int*> tex_components;
 
         int frag_index;
         int vert_index;
@@ -116,9 +120,9 @@ namespace REG{
 
     };
 
-    struct Light : public Component{
-        float light_intensity;
-    };
+    //struct Light : public Component{
+    //    float light_intensity;
+    //};
     
 
     

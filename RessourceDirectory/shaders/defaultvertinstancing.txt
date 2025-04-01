@@ -1,0 +1,17 @@
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 n;
+layout (location = 2) in mat4 instanceMatrix;\n
+out float light;
+uniform mat4 projection;
+uniform mat4 view;
+void main()
+{
+   mat3 normalMatrix = mat3(transpose(inverse(instanceMatrix)));
+   vec3 worldNormal = normalize(normalMatrix * n);
+   light = dot(n, -1*normalize((instanceMatrix*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz));\n
+   if(light<0){
+       light = 0;
+   }
+   gl_Position = projection * view * instanceMatrix * vec4(aPos, 1.0);
+}

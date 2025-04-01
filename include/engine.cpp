@@ -54,11 +54,26 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
     unsigned int currentIndex = 0;
 
-    for (size_t i = 0; i < d.faces->len(); ++i) {
-        auto& face = d.faces->get(i);
+    int n = (!d.is_normal && !d.is_uv)?1:((d.is_normal && d.is_uv)?3:2);
 
-        MATH::vec3 v = d.vertices->get(static_cast<int>(face.first));
-        MATH::vec3 n = d.normals->get(static_cast<int>(face.second));
+    for (int i = 0; i < d.faces->len(); i+=n) {
+
+        
+        MATH::vec3 v = d.vertices->get(d.faces->get(i));
+        MATH::vec3 n = vec3(0,0,0);
+        MATH::vec2 uv;
+
+        if(d.is_normal && d.is_uv){
+
+
+            uv = d.UV->get(d.faces->get(i+1));
+            n = d.normals->get(d.faces->get(i+2));
+        }
+        else{
+
+            if(d.is_normal) n = d.normals->get(d.faces->get(i+1));
+            else uv = d.UV->get(d.faces->get(i+1));
+        }
 
         auto key = std::make_tuple(v.x, v.y, v.z, n.x, n.y, n.z);
 
@@ -72,6 +87,10 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
             vertexBuffer.push_back(n.x);
             vertexBuffer.push_back(n.y);
             vertexBuffer.push_back(n.z);
+            if (d.is_uv) {
+                vertexBuffer.push_back(uv.x);
+                vertexBuffer.push_back(uv.y);
+            }
             indexBuffer.push_back(currentIndex);
             ++currentIndex;
         } else {
@@ -100,9 +119,25 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
     return result;
 }
 
+void Engine::processTextures(){
+    List<int>* entities = Reg.getEntities<Material>();
+    for (auto& id : *entities) {
+        for(auto& keyvalue:(dynamic_cast<Material*> (getComponent<Material>(id))->tex_components )){
+
+            unsigned int r = *keyvalue.second;
+            TextureData* txt = dynamic_cast<TextureData*>(RessMan.getData(r));
+
+            gpu->createTexture(*keyvalue.second, txt->width, txt->height, txt->nrchannels, txt->data);
+            gpu->bindTexture(*keyvalue.second, 0);
+
+        }
+    }
+
+}
+
 void Engine::processInstances() {
     List<int>* entities = Reg.getEntities<Instances>();
-
+    if(entities ==nullptr)return;
     for (auto& id : *entities) {
         Instances* inst = Reg.getComponent<Instances>(id);
         Mesh* mesh = Reg.getComponent<Mesh>(id);
@@ -145,10 +180,24 @@ void Engine::processInstances() {
             
             gpu->createVertexArray(mesh->vao);
             gpu->bindVertexArray(mesh->vao);
-    
-            gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
+
+            if (!data->is_normal && !data->is_uv){
+                gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 3 * sizeof(float));
+                gpu->structBuffer(0, 3, 3, 0);
+
+            }else if(data->is_normal && data->is_uv){gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 9 * sizeof(float));
+                //vertex
+                gpu->structBuffer(0, 3, 8, 0);
+                //uv
+                gpu->structBuffer(1, 2, 8, 3);
+                //normal
+                gpu->structBuffer(3, 3, 8, 5);
+
+            }else {gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
             gpu->structBuffer(0, 3, 6, 0);
-            gpu->structBuffer(1, 3, 6, 3);
+            if (data->is_normal) gpu->structBuffer(1, 3, 6, 3);
+            else gpu->structBuffer(1, 2, 6, 3);
+            }
             
             gpu->createIndexBuffer(mesh->ebo, processed->indices, processed->indexCount * sizeof(unsigned int));
             mesh->vertex_count = processed->indexCount;
@@ -202,46 +251,12 @@ void Engine::processInstances() {
         std::cout <<std::endl;
         std::cout << "Creating default material"<<std::endl;
         //default shader. will be stored in settings class
-        const char* default_vert_shader = "#version 330 core\n"
-                                                     "layout (location = 0) in vec3 aPos;\n"
-                                                     "layout (location = 1) in vec3 n;\n"
-                                                     "out float light;\n"
-                                                     "uniform mat4 model;\n"
-                                                     "uniform mat4 projection;\n"
-                                                     "uniform mat4 view;\n"
-                                                     "void main()\n"
-                                                     "{\n"
-                                                     "   light = dot(n, -1*normalize((model*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz)) ;\n"
-                                                     "   if(light<0){\n"
-                                                     "       light = 0;\n"
-                                                     "   }\n"
-                                                     "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                                     "}\0";
-        const char* default_vert_shader_instancing = "#version 330 core\n"
-                                          "layout (location = 0) in vec3 aPos;\n"
-                                          "layout (location = 1) in vec3 n;\n"
-                                          "layout (location = 2) in mat4 instanceMatrix;\n"  
-                                          "out float light;\n"
-                                          "uniform mat4 projection;\n"
-                                          "uniform mat4 view;\n"
-                                          "void main()\n"
-                                          "{\n"
-                                          "   mat3 normalMatrix = mat3(transpose(inverse(instanceMatrix)));\n"
-                                          "   vec3 worldNormal = normalize(normalMatrix * n);\n"
-                                          "   light = dot(n, -1*normalize((instanceMatrix*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz));\n"  
-                                          "   if(light<0){\n"
-                                          "       light = 0;\n"
-                                          "   }\n"
-                                          "   gl_Position = projection * view * instanceMatrix * vec4(aPos, 1.0);\n"
-                                          "}\n\0";
+        const char* default_vert_shader =(dynamic_cast<ShaderData*> (RessMan.getData(3)))->shaderString;
 
-        const char* default_frag_shader = "#version 330 core\n"
-                                            "in float light;\n"
-                                            "out vec4 FragColor; \n"
-                                            "void main()\n"
-                                            "{\n"
-                                            "	FragColor = vec4(1.0f*light, 0.0f*light, 1.0f*light, 1.0f); \n"
-                                            "}\n";
+
+        const char* default_vert_shader_instancing = (dynamic_cast<ShaderData*> (RessMan.getData(5)))->shaderString;
+
+        const char* default_frag_shader = (dynamic_cast<ShaderData*> (RessMan.getData(4)))->shaderString;
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
         gpu->createShader(Settings::getDefaultShaderInstanced(), default_vert_shader_instancing, default_frag_shader);
@@ -269,6 +284,14 @@ void Engine::processInstances() {
         std::cout << "traitement des instances"<<std::endl;
         std::cout <<std::endl;
         processInstances();
+        std::cout << "instances instancé"<<std::endl;
+        std::cout <<std::endl;
+
+        std::cout << "traitement des Textures"<<std::endl;
+        std::cout <<std::endl;
+        processTextures();
+        std::cout << "instances Textures"<<std::endl;
+        std::cout <<std::endl;
     }
 
     void Engine::duplicate(int entity, const vec3& v){

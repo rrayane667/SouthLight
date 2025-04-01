@@ -12,6 +12,9 @@ namespace RESSOURCES{
         Ressources = SparseSet<Ressource*>();
         Paths = new DynamicList<Trio<std::string>>();
         FactoriesFunc["a"]["mesh"] = &AbstractFactory::createMeshData;
+        FactoriesFunc["a"]["texture"] = &AbstractFactory::createTextureData;
+        FactoriesFunc["a"]["texte"] = &AbstractFactory::createShaderData;
+
         Factories["a"] = new RessourceFactoryTypeA;
 
         std::ifstream inputFile(manifest_path);
@@ -31,18 +34,23 @@ namespace RESSOURCES{
 
     Ressource* RessourceManager::get(int ressource_index){  // si indice superieur a taille manifest????
         load(ressource_index);
-        
+
         return Ressources[ressource_index];
     }
 
     void RessourceManager::load(int ressource_index){
+
         if(ressource_index >= Paths->len()) throw std::runtime_error("zbi ra makaynch had lfichier ");
 
         if (Ressources.getIndex(ressource_index) ==-1){
             createRessource(ressource_index);
+
         }
+
         if(!Ressources[ressource_index]->isLoaded()){
+
             Ressources[ressource_index]->load();
+
         }
         
     }
@@ -50,10 +58,11 @@ namespace RESSOURCES{
     void RessourceManager::createRessource(int ressource_index){
         if (Ressources.getIndex(ressource_index)!=-1) return;
 
+
         std::string ressource_path = (Paths->get(ressource_index))[0];
         std::string ressource_type = (Paths->get(ressource_index))[1];
         std::string ressource_variant = (Paths->get(ressource_index))[2];
-
+        
         Ressource* res = (Factories[ressource_variant]->*FactoriesFunc[ressource_variant][ressource_type])(ressource_path, ressource_index);//placeholder
         Ressources.set(ressource_index, res);
 

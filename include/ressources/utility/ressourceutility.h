@@ -28,7 +28,14 @@ namespace RESSOURCES{
         
         void load(const std::string& path,  Data*& data,const std::string& type_variant)  override;
 
-        static void _jspLoader(const std::string& path,  MeshData& data);
+        static void _jspLoader(const std::string& path,  TextureData& data);
+    };
+
+    struct TexteLoader : public Loader {
+        
+        void load(const std::string& path,  Data*& data,const std::string& type_variant)  override;
+
+        static void _jspLoader(const std::string& path,  ShaderData& data);
     };
 
 
@@ -43,6 +50,7 @@ namespace RESSOURCES{
     struct AbstractFactory{
         virtual Ressource* createMeshData(std::string path, int ressource_index) = 0;
         virtual Ressource* createTextureData(std::string path, int ressource_index) = 0;
+        virtual Ressource* createShaderData(std::string path, int ressource_index) = 0;
     };
 
 
@@ -53,6 +61,7 @@ namespace RESSOURCES{
         public :
             Ressource* createMeshData(std::string path, int ressource_index) override;
             Ressource* createTextureData(std::string path, int ressource_index) override;
+            Ressource* createShaderData(std::string path, int ressource_index) override;
     };
 
     

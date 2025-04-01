@@ -4,7 +4,9 @@
 #include <fstream>
 #include "utilite/parser.h"
 #include "maths/vec.h"
+#include "utilite/fileUtil.h"
 
+#include "stb_image.h"
 
 namespace RESSOURCES{
 
@@ -17,6 +19,11 @@ namespace RESSOURCES{
     Ressource* RessourceFactoryTypeA::createTextureData(std::string path, int ressource_index) {
         
         return (new Ressource(path,new TextureLoader(), ressource_index, "a"));
+    }
+
+    Ressource* RessourceFactoryTypeA::createShaderData(std::string path, int ressource_index) {
+        
+        return (new Ressource(path,new TexteLoader(), ressource_index, "a"));
     }
 
 
@@ -70,6 +77,7 @@ namespace RESSOURCES{
                 MATH::vec2 vt = texture_coordinate;
                 data.UV->append(vt);
                 delete texture_coordinate;
+                data.is_uv = true;
                 
             }
             else if (line.substr(0,2) == "vn"){
@@ -77,14 +85,37 @@ namespace RESSOURCES{
                 MATH::vec3 vn = normal;
                 data.normals->append(vn);
                 delete normal;
-                
+                data.is_normal = true;
             }
             else if(line.substr(0,1) == "f"){
                 List<float>* face = (UTILITY::NumberParser::parse(line));
-                if (face->len() >= 6) { 
-                    data.faces->append(paire<float, float>(face->get(0)-1, face->get(1)-1));
-                    data.faces->append(paire<float, float>(face->get(2)-1, face->get(3)-1));
-                    data.faces->append(paire<float, float>(face->get(4)-1, face->get(5)-1));
+                if (!data.is_normal && !data.is_uv) {
+                    data.faces->append(face->get(0)-1);
+                    data.faces->append(face->get(1)-1);
+                    data.faces->append(face->get(2)-1);
+                
+                }else if(data.is_normal && data.is_uv){
+                    data.faces->append(face->get(0)-1);
+                    data.faces->append(face->get(1)-1);
+                    data.faces->append(face->get(2)-1);
+                    data.faces->append(face->get(3)-1);
+                    data.faces->append(face->get(4)-1);
+                    data.faces->append(face->get(5)-1);
+                    data.faces->append(face->get(6)-1);
+                    data.faces->append(face->get(7)-1);
+                    data.faces->append(face->get(8)-1);
+
+                }
+                
+                else {
+                    data.faces->append(face->get(0)-1);
+                    data.faces->append(face->get(1)-1);
+                    data.faces->append(face->get(2)-1);
+                    data.faces->append(face->get(3)-1);
+                    data.faces->append(face->get(4)-1);
+                    data.faces->append(face->get(5)-1);
+                    
+                
                 }
                 delete face;
                 
@@ -96,18 +127,34 @@ namespace RESSOURCES{
     }
 
     void TextureLoader::load(const std::string& path,  Data*& data,const std::string& type_variant) {
-
+        data = new TextureData();
         if (type_variant == "a"){
-            TextureLoader::_jspLoader(path, dynamic_cast<MeshData&> (*data));
+            TextureLoader::_jspLoader(path, dynamic_cast<TextureData&> (*data));
         }
         
     }
 
-    void TextureLoader::_jspLoader(const std::string& path,  MeshData& data){
-        // a implementer
-        return;
+    void TextureLoader::_jspLoader(const std::string& path,  TextureData& data){
+
+	    data.data = stbi_load(path.c_str(), &(data.width), &(data.height), &(data.nrchannels), 0);
+
     }
 
+    void TexteLoader::load(const std::string& path,  Data*& data,const std::string& type_variant) {
+        data = new ShaderData();
+        if (type_variant == "a"){
 
+            TexteLoader::_jspLoader(path, dynamic_cast<ShaderData&> (*data));
+        }
+        
+    }
+
+    void TexteLoader::_jspLoader(const std::string& path,  ShaderData& data){
+
+        data.shaderString = readFiles(path);
+
+
+        
+    }
 
 }

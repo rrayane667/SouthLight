@@ -98,13 +98,13 @@ TEST_CASE("MeshLoader face parsing", "[MeshLoader]") {
     std::ofstream("face_test.obj") << "f 1/2/3 4/5/6 7/8/9\n";
     
     RESSOURCES::MeshData data;
-    data.faces = new DynamicList<paire<float, float>>; // Fix for uninitialized member
+    data.faces = new DynamicList<float>; // Fix for uninitialized member
     
     RESSOURCES::MeshLoader::_objLoader("face_test.obj", data);
     
-    REQUIRE(data.faces->len() == 3);
-    REQUIRE(data.faces->get(0).first == 1);
-    REQUIRE(data.faces->get(0).second == 2);
+    REQUIRE(data.faces->len() == 9);
+    REQUIRE(data.faces->get(0) == 1);
+    REQUIRE(data.faces->get(4) == 5);
     delete data.faces;
 }
 

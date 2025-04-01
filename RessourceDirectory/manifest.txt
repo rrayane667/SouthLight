@@ -1,3 +1,10 @@
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\teapot.obj mesh a}
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\plan.obj mesh a}
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\9rd.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\defaultvert.txt texte a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\defaultfrag.txt texte a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\defaultvertinstancing.txt texte a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\tstfrag.txt texte a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\tstvert.txt texte a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\petiTest.jpg texture a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\teapotUV.obj mesh a}
