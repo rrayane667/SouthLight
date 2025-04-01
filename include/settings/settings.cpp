@@ -18,6 +18,7 @@ class Settings{
         static inline float WIDTH = 800, HEIGHT = 800;
         static inline Settings* ptr = nullptr;
         static inline unsigned int* default_shader = new unsigned int;
+        static inline unsigned int* default_shader_instanced = new unsigned int;
 
         Settings() {
 
@@ -41,6 +42,7 @@ class Settings{
 
 
         inline static unsigned int* getDefaultShader(){return default_shader;}
+        inline static unsigned int* getDefaultShaderInstanced(){return default_shader_instanced;}
 
         static void setRenderer(RENDERER_TYPE r) {
             renderer_type = r;

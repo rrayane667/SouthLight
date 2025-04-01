@@ -115,8 +115,9 @@ void Engine::processInstances() {
 
         }
 
+
         gpu->bindVertexArray(mesh->vao);
-        gpu->createVertexBuffer(inst->instanceBuffer, buffer, 16*inst->instances->len());
+        gpu->createVertexBuffer(inst->instanceBuffer, buffer, 16 * inst->instances->len() * sizeof(float));
         delete[] buffer; 
 
 
@@ -184,8 +185,11 @@ void Engine::processInstances() {
 
 
                 Reg.addComponent<Material>(x);
-                (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader() ;
+                if(Reg.hasComponent<Instances>(x))Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ;
+                
+                else (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader();
                 (Reg.getComponent<Material>(x))->is_loaded = true;
+
             }
 
 
@@ -199,6 +203,21 @@ void Engine::processInstances() {
         std::cout << "Creating default material"<<std::endl;
         //default shader. will be stored in settings class
         const char* default_vert_shader = "#version 330 core\n"
+                                                     "layout (location = 0) in vec3 aPos;\n"
+                                                     "layout (location = 1) in vec3 n;\n"
+                                                     "out float light;\n"
+                                                     "uniform mat4 model;\n"
+                                                     "uniform mat4 projection;\n"
+                                                     "uniform mat4 view;\n"
+                                                     "void main()\n"
+                                                     "{\n"
+                                                     "   light = dot(n, -1*normalize((model*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz)) ;\n"
+                                                     "   if(light<0){\n"
+                                                     "       light = 0;\n"
+                                                     "   }\n"
+                                                     "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                                     "}\0";
+        const char* default_vert_shader_instancing = "#version 330 core\n"
                                           "layout (location = 0) in vec3 aPos;\n"
                                           "layout (location = 1) in vec3 n;\n"
                                           "layout (location = 2) in mat4 instanceMatrix;\n"  
@@ -225,6 +244,7 @@ void Engine::processInstances() {
                                             "}\n";
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
+        gpu->createShader(Settings::getDefaultShaderInstanced(), default_vert_shader_instancing, default_frag_shader);
         std::cout << " default material mcha"<<std::endl;
 
         std::cout <<std::endl;

@@ -76,11 +76,17 @@ namespace SYSTEMS{
             for(const auto& x:(*entite)){
 
 
-                //gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
+
                 gpu->events();
                 
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
-                gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, 1000);
+
+                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len());
+                else{
+                    gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
+                    gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
+                }
+                
                 
                 
 

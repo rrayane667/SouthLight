@@ -28,17 +28,14 @@ int main(int, char**){
     );
     
 
-    for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < 10; j++) {
-            for(int k = 0; k < 10; k++) {
+    for(int i = 0; i < 20; i++) {
+        for(int j = 0; j < 20; j++) {
+            for(int k = 0; k < 20; k++) {
 
-    
-                
-                
                 stpKhdm.duplicate(object, vec3(
-                    75.0f * i/9 - 32.5f,  
-                    75.0f * j/9 - 32.5f,  
-                    10.0f + 100.0f * k/9  
+                    150.0f * i/19 - 75.5f,  
+                    150.0f * j/19 - 75.5f,  
+                    10.0f + 100.0f * k/19  
                 ));
                 
                 
