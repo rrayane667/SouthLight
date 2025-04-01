@@ -50,7 +50,7 @@ namespace ENGINE {
 
             inline int createEntity(){return Reg.createEntity();}
 
-            void duplicate(int entity);
+            void duplicate(int entity, const vec3& v);
 
             inline void addSystem(SYSTEM s){return SysMan.addSystem(s);}
 
@@ -59,6 +59,7 @@ namespace ENGINE {
             void processEvents();
             void processMaterials();
             void processMeshes();
+            void processInstances();
             
             static ProcessedMesh* processMesh(const MeshData& d);
 

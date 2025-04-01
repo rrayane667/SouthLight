@@ -13,6 +13,7 @@ namespace SYSTEMS{
             inline SystemManager() {std::cout << "System manager constructed" << std::endl;std::cout << std::endl;};
             void addSystem(System* s);
             void addSystem(SYSTEM s);
+            inline System* getSystem(SYSTEM s){return systems_map[s];}
 
             void initAllSystems(REG::Registry& reg);
             void startAllsystems(REG::Registry& reg);

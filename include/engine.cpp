@@ -99,6 +99,39 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
     return result;
 }
+
+void Engine::processInstances() {
+    List<int>* entities = Reg.getEntities<Instances>();
+
+    for (auto& id : *entities) {
+        Instances* inst = Reg.getComponent<Instances>(id);
+        Mesh* mesh = Reg.getComponent<Mesh>(id);
+        float* buffer = new float[16 * inst->instances->len()];
+        float* copy = buffer;
+
+        for (auto& x : *(inst->instances)) { 
+            std::memcpy(copy, Reg.getComponent<Transform>(x)->model.list, 16*sizeof(float));
+            copy += 16;
+
+        }
+
+
+        gpu->bindVertexArray(mesh->vao);
+        gpu->createVertexBuffer(inst->instanceBuffer, buffer, 16 * inst->instances->len() * sizeof(float));
+        delete[] buffer; 
+
+
+        gpu->structBuffer(2, 4, 16*sizeof(float), 0);
+        gpu->structBuffer(3, 4, 16*sizeof(float), 4);
+        gpu->structBuffer(4, 4, 16*sizeof(float), 8);
+        gpu->structBuffer(5, 4, 16*sizeof(float), 12);
+
+        gpu->instanceDiviseur(2, 1);
+        gpu->instanceDiviseur(3, 1);
+        gpu->instanceDiviseur(4, 1);
+        gpu->instanceDiviseur(5, 1);
+    }
+}
     
 
     void Engine::processMeshes() {
@@ -152,8 +185,11 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 
 
                 Reg.addComponent<Material>(x);
-                (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader() ;
+                if(Reg.hasComponent<Instances>(x))Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ;
+                
+                else (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader();
                 (Reg.getComponent<Material>(x))->is_loaded = true;
+
             }
 
 
@@ -167,20 +203,37 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
         std::cout << "Creating default material"<<std::endl;
         //default shader. will be stored in settings class
         const char* default_vert_shader = "#version 330 core\n"
-                                        "layout (location = 0) in vec3 aPos;\n"
-                                        "layout (location = 1) in vec3 n;\n"
-                                        "out float light;\n"
-                                        "uniform mat4 model;\n"
-                                        "uniform mat4 projection;\n"
-                                        "uniform mat4 view;\n"
-                                        "void main()\n"
-                                        "{\n"
-                                        "   light = dot(n, -1*normalize((model*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz)) ;\n"
-                                        "   if(light<0){\n"
-                                        "       light = 0;\n"
-                                        "   }\n"
-                                        "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-                                        "}\0";
+                                                     "layout (location = 0) in vec3 aPos;\n"
+                                                     "layout (location = 1) in vec3 n;\n"
+                                                     "out float light;\n"
+                                                     "uniform mat4 model;\n"
+                                                     "uniform mat4 projection;\n"
+                                                     "uniform mat4 view;\n"
+                                                     "void main()\n"
+                                                     "{\n"
+                                                     "   light = dot(n, -1*normalize((model*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz)) ;\n"
+                                                     "   if(light<0){\n"
+                                                     "       light = 0;\n"
+                                                     "   }\n"
+                                                     "   gl_Position = projection*view*model*vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                                     "}\0";
+        const char* default_vert_shader_instancing = "#version 330 core\n"
+                                          "layout (location = 0) in vec3 aPos;\n"
+                                          "layout (location = 1) in vec3 n;\n"
+                                          "layout (location = 2) in mat4 instanceMatrix;\n"  
+                                          "out float light;\n"
+                                          "uniform mat4 projection;\n"
+                                          "uniform mat4 view;\n"
+                                          "void main()\n"
+                                          "{\n"
+                                          "   mat3 normalMatrix = mat3(transpose(inverse(instanceMatrix)));\n"
+                                          "   vec3 worldNormal = normalize(normalMatrix * n);\n"
+                                          "   light = dot(n, -1*normalize((instanceMatrix*vec4(aPos.x, aPos.y, aPos.z, 1.0)).xyz));\n"  
+                                          "   if(light<0){\n"
+                                          "       light = 0;\n"
+                                          "   }\n"
+                                          "   gl_Position = projection * view * instanceMatrix * vec4(aPos, 1.0);\n"
+                                          "}\n\0";
 
         const char* default_frag_shader = "#version 330 core\n"
                                             "in float light;\n"
@@ -191,6 +244,7 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
                                             "}\n";
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
+        gpu->createShader(Settings::getDefaultShaderInstanced(), default_vert_shader_instancing, default_frag_shader);
         std::cout << " default material mcha"<<std::endl;
 
         std::cout <<std::endl;
@@ -211,6 +265,20 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
         SysMan.initAllSystems(Reg);
         std::cout << "systemes initialisé"<<std::endl;
         std::cout <<std::endl;
+
+        std::cout << "traitement des instances"<<std::endl;
+        std::cout <<std::endl;
+        processInstances();
+    }
+
+    void Engine::duplicate(int entity, const vec3& v){
+        Instanceur *inst = dynamic_cast<Instanceur*> (SysMan.getSystem(INSTANCEUR));
+
+        inst->instance(Reg, entity);
+
+        Transform* t = dynamic_cast<Transform*> ( Reg.getComponent<Transform>(Reg.entitiesCount()));
+        t->position = v;
+
     }
 
     void Engine::setScale(float& x, float& y, float& z){

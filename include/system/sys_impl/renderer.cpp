@@ -42,6 +42,7 @@ namespace SYSTEMS{
 
     void Renderer::onStart(REG::Registry& reg){
         for(const auto& keyvalue: entities){
+
             mat4 projection;
             if (cam->projection == PERSPECTIVE) projection = mat4::perspective(cam->cp->fov, cam->cp->ratio,cam->cp->n ,cam->cp->f );
             else projection = mat4::orthographic(cam->co->r, cam->co->l, cam->co->t, cam->co->b, cam->co->n, cam->co->f);
@@ -75,11 +76,17 @@ namespace SYSTEMS{
             for(const auto& x:(*entite)){
 
 
-                gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
+
                 gpu->events();
                 
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
-                gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
+
+                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len());
+                else{
+                    gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
+                    gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
+                }
+                
                 
                 
 
