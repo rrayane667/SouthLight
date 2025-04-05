@@ -5,6 +5,8 @@ using namespace ENGINE;
 
 //assets f scene manager = component stocké
 
+
+
 int main(int, char**){
 
 
@@ -13,30 +15,41 @@ int main(int, char**){
     stpKhdm.addSystem(INSTANCEUR);
     stpKhdm.addSystem(TRANSFORMER);
     stpKhdm.addSystem(RENDERER);
-    
+    stpKhdm.addSystem(INPUT);
+    stpKhdm.addSystem(MVT);
+    stpKhdm.addSystem(CAMERA_CONTROL);
 
     int object = stpKhdm.createEntity();
     stpKhdm.addComponent<Mesh>(object);
     Mesh* mesh = dynamic_cast<Mesh*>(stpKhdm.getComponent<Mesh>(object));
-    mesh->ressource = 9;
+    mesh->ressource = 0;
+
+
+
+    
 
     Transform* t = dynamic_cast<Transform*>(stpKhdm.getComponent<Transform>(object));
     t->scale = vec3(1.0f, 1.0f, 1.0f);
-    t->position = vec3(
-        0,  
-        -2,  
-        20   
-    );
-    stpKhdm.addComponent<Material>(object);
-    Material* mat = dynamic_cast<Material*>(stpKhdm.getComponent<Material>(object));
-    mat->frag_index = 6;
-    mat->vert_index = 7;
-    unsigned int txtre = 8;
+    t->position = vec3( 10, 0, 10 );
+    int n=25;
+    for(int i = 0; i <= n; i++){
+        for(int j = 0; j < n; j++){
+            for(int k = 0; k < n; k++){
+                stpKhdm.duplicate(object, vec3(300*i/n - 150, 300*j/n - 150, 290*k/n + 10));
+            }
+        }
+    }
+    
+    
 
-    mat->tex_components["a"] = &txtre;
+
+    
+
+
 
 
     stpKhdm.addComponent<Camera>(stpKhdm.createEntity());
+
     stpKhdm.run();
 
 }

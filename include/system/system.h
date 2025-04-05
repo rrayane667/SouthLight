@@ -3,10 +3,15 @@
 #include "gpu/gpu.h"
 #include <unordered_map>
 #include <iostream>
-#include "eventmanager/event.h"
+#include "eventmanager/eventmanager.h"
+#include <algorithm>
+#include "settings/settings.cpp"
 
+using namespace EVENTS;
 using namespace REG;
 using namespace GPU;
+
+
 
 namespace SYSTEMS{
     typedef enum sys{
@@ -14,29 +19,39 @@ namespace SYSTEMS{
         RENDERER,
         TRANSFORMER,
         PHYSICS,
-        COLLISION
+        COLLISION,
+        INPUT,
+        MVT,
+        CAMERA_CONTROL,
     } SYSTEM;
     class System{
-        public:
 
-            virtual void onInit(REG::Registry& reg) = 0;
-            virtual void onStart(REG::Registry& reg) = 0;
-            virtual void update(REG::Registry& reg) = 0;
+        
+        public:
+            inline System(EventManager& e, REG::Registry& r) : em(e), reg(r) {}
+            virtual void onInit() = 0;
+            virtual void onStart() = 0;
+            virtual void update() = 0;
             virtual void ondestroy() = 0;
 
             virtual SYSTEM getId() = 0;
+
+            inline void subscribe(EventType e, Callback c){em.subscribe(e, c);}
+            inline void publish(Event* e){ em.publish(e);}
 
             friend std::ostream& operator<<(std::ostream& o, System& s){
                 o << s.getId();
                 return o;
             }
+            EventManager& em;
+            REG::Registry& reg;
     };
     class Instanceur : public System{
         public:
-            Instanceur(){std::cout << "INSTANCIATION INSTANCEE"<<std::endl;}
-            inline void onInit(REG::Registry& reg) override {}
-            inline void onStart(REG::Registry& reg) override{}
-            inline void update(REG::Registry& reg) override {}
+            Instanceur(EventManager& e, REG::Registry& r) : System(e, r) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;}
+            inline void onInit() override {}
+            inline void onStart() override{}
+            inline void update() override {}
             inline void ondestroy() override {}
             inline SYSTEM getId() {return INSTANCEUR;}
 
@@ -44,38 +59,152 @@ namespace SYSTEMS{
                 reg.addComponent<Instances>(entity);
                 
                 Instances* inst = dynamic_cast<Instances*> (reg.getComponent<Instances>(entity));
-
+                if (!inst->instances->len()) inst->instances->append(entity);
                 inst->instances->append(reg.createEntity());
 
             }
     };
 
     class Transformer : public System {
+   
         public:
-            Transformer() {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;};
+            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;};
             ~Transformer() = default;
         
 
-            void onInit(REG::Registry& reg) override;
-            inline void onStart(REG::Registry& reg) override {};
-            inline void update(REG::Registry& reg) override {};
+            void onInit() override;
+            inline void onStart() override {};
+            inline void update() override {};
             inline void ondestroy() override{};
             inline SYSTEM getId() override {return TRANSFORMER;};
 
-            inline vec3 getPosition(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->position;}
-            inline vec3 getRotation(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->rotation;}
-            inline vec3 getScale(REG::Registry& reg, int entity){return reg.getComponent<Transform>(entity)->scale;}
+            inline vec3 getPosition( int entity){return reg.getComponent<Transform>(entity)->position;}
+            inline vec3 getRotation(int entity){return reg.getComponent<Transform>(entity)->rotation;}
+            inline vec3 getScale(int entity){return reg.getComponent<Transform>(entity)->scale;}
 
-            void setPosition(REG::Registry& reg, int entity, const vec3& v);
-            void setRotation(REG::Registry& reg, int entity, const vec3& v);
-            void setScale(REG::Registry& reg, int entity, const vec3& v);
-        
-        private:
-            //callback pour event manager
-            //void onTransformUpdated(const Event& event);
-            void updateMatrix(REG::Registry& reg, int& x);
+            void setPosition(int entity, const vec3& v);
+            void setRotation(int entity, const vec3& v);
+            void setScale(int entity, const vec3& v);
+            void updateMatrix( int& x);
         
 
+        };
+        class Mvt : public System{
+            float speed = 1;
+            Transform* cam_trans;
+            public:
+
+            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){}
+            inline void onInit() override {em.subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){handleEvent(event);}));cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
+            inline void onStart() override {}
+            inline void update() override{}
+            inline void ondestroy() override{}
+    
+            inline SYSTEM getId() override{return RENDERER;}
+            
+            inline void handleEvent(Event* event) {
+                KeyPressEvent* keyevent = dynamic_cast<KeyPressEvent*>(event);
+                if (!keyevent) {
+                    std::cout << "Received non-key event" << std::endl;
+                    return;
+                }
+                float sensitivity = Settings::getSensi();
+                Transform* trans = reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));
+            
+                double pitch = trans->rotation.x*3.1415* sensitivity/180;
+                double yaw = trans->rotation.y*3.1415* sensitivity/180;
+            
+                // Calculate camera forward direction from yaw and pitch
+                vec3 forward(
+                    -cos(pitch) * sin(yaw),
+                    -sin(pitch),
+                    -cos(pitch) * cos(yaw)
+                );
+                forward = forward.normalize();
+            
+                // Calculate right and up vectors
+                vec3 worldUp(0, 1, 0);
+                vec3 right = forward.cross(worldUp).normalize();
+                vec3 up = right.cross(forward).normalize();  // optional, useful for flying
+            
+                switch (keyevent->key) {
+                    case 87: // Z
+                        trans->position += forward*speed;
+                        break;
+                    case 83: // S
+                        trans->position -= forward*speed;
+                        break;
+                    case 68: // D
+                        trans->position += right*speed;
+                        break;
+                    case 65: // A
+                        trans->position -= right*speed;
+                        break;
+                }
+            
+                if (keyevent->key >= 65 && keyevent->key <= 90) {
+                    publish(new CameraTransformUpdate());
+                }
+            }
+        };
+
+        class CameraController : public System {
+
+            float sensitivity = Settings::getInstance()->getSensi();
+            float yaw = 0.0f, pitch = 0.0f;
+        
+        public:
+            CameraController(EventManager& e, REG::Registry& r) : System(e,r) {
+                subscribe(MOUSE_MOVE, Callback([this](Event* e) { handleMouse(e); }));
+            }
+        
+            void handleMouse(Event* event) {
+                
+                auto* mouseEvent = dynamic_cast<const MouseMoveEvent*>(event);
+                if (!mouseEvent) return;
+        
+                yaw += static_cast<float>(mouseEvent->xPos) ;
+                pitch -= static_cast<float>(mouseEvent->yPos) ;
+        
+
+                float sensitivity = Settings::getInstance()->getSensi();
+                if (pitch>=90/sensitivity){pitch = 90/sensitivity;}
+                if (pitch<=-90/sensitivity){pitch = -90/sensitivity;}
+
+        
+
+                reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0) )->rotation = vec3(pitch, yaw, 0); 
+                CameraTransformUpdate* c = new CameraTransformUpdate();
+                publish(c);
+
+            }
+            void onInit() override {}
+            void onStart() override {}
+            void update() override {}
+            void ondestroy() override {}
+            SYSTEM getId() override { return CAMERA_CONTROL; }
+        };
+
+        class InputReading : public System {
+            GraphicsDevice* gpu;
+        
+        public:
+            inline InputReading(EventManager& e, REG::Registry& r) : System(e, r) { 
+                std::cout << "Input System Initialized" << std::endl;
+                gpu = GraphicsDevice::getInstance();
+            }
+        
+            void onInit() override {}
+            void onStart() override {}
+        
+            inline void update() override {
+                gpu->InputEvents(em);  
+                gpu->mouseEvents(em);
+            }
+        
+            inline void ondestroy() override {}
+        
+            inline SYSTEM getId() override { return INPUT; }
         };
 
 
@@ -88,16 +217,18 @@ namespace SYSTEMS{
         Transform* camTrans;
         public:
 
-            Renderer();
+            Renderer(EventManager& e, REG::Registry& r);
             ~Renderer() = default;
 
 
-            void onInit(REG::Registry& reg) override;
-            void onStart(REG::Registry& reg);
-            void update(REG::Registry& reg) override;
+            void onInit() override;
+            void onStart();
+            void update() override;
             inline void ondestroy() {}
 
             inline SYSTEM getId() override{return RENDERER;}
+
+            void updateCamera();
     };
 
 
@@ -105,6 +236,6 @@ namespace SYSTEMS{
 
     struct SystemFactory{
 
-        static System* createSystem(SYSTEM type);
+        //static System* createSystem(SYSTEM type);
     };
 }

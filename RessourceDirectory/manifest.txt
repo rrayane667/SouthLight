@@ -8,3 +8,11 @@ C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\tstfrag.txt texte a}
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\shaders\tstvert.txt texte a}
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\petiTest.jpg texture a}
 C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\teapotUV.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\statue.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\statue.jpg texture a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\head.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\head.jpg texture a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\pelle.jpg texture a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\pelle.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\mesh\maison.obj mesh a}
+C:\Users\ORDI\Desktop\openGL\RessourceDirectory\textures\maison.png texture a}

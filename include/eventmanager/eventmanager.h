@@ -7,13 +7,30 @@
 
 namespace EVENTS{
 
-    class EventManager{
-        using Callback = std::function<void(const Event& event)>;
+    struct Callback{
+        std::function<void(Event* event)> func;
+        inline Callback(std::function<void(Event*)> f) : func(std::move(f)) {}
+        void operator()(Event* event) const {
+            if (func) func(event);
+        }
 
-        //std::unordered_map<EventType,DATASTRUCT::DynamicList<Callback>> file;
+        friend std::ostream& operator<<(std::ostream& o, const Callback& f) {
+            o<<"function pointer";
+            return o;
+        }
+    };
+
+    class EventManager{
+        
+
+
+        std::unordered_map<EventType,DATASTRUCT::DynamicList<Callback>> subscribers;
+        DATASTRUCT::DynamicList<Event*> event_stack;
         public:
+            //inline EventManager() : event_stack() {}
             void subscribe(EventType type, Callback c);
-            void publish(const Event& event);
+            void publish(Event* event);
+            void processEvents();
 
     };
 }

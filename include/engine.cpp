@@ -14,7 +14,7 @@ using namespace REG;
 namespace ENGINE{
     
 
-    Engine::Engine(RENDERER_TYPE type) : SysMan(), EvMan(), Reg(), RessMan() {
+    Engine::Engine(RENDERER_TYPE type) : SysMan(EvMan), EvMan(), Reg(), RessMan() {
         std::cout << "CStarting Engine..." << std::endl;
         s = Settings::getInstance();
         s->setRenderer(type);
@@ -122,13 +122,16 @@ ProcessedMesh* Engine::processMesh(const MeshData& d) {
 void Engine::processTextures(){
     List<int>* entities = Reg.getEntities<Material>();
     for (auto& id : *entities) {
+        int i = 0;
         for(auto& keyvalue:(dynamic_cast<Material*> (getComponent<Material>(id))->tex_components )){
 
             unsigned int r = *keyvalue.second;
             TextureData* txt = dynamic_cast<TextureData*>(RessMan.getData(r));
 
             gpu->createTexture(*keyvalue.second, txt->width, txt->height, txt->nrchannels, txt->data);
-            gpu->bindTexture(*keyvalue.second, 0);
+            gpu->bindTexture(*keyvalue.second, i++);
+            RessMan.unload(r);
+            
 
         }
     }
@@ -139,10 +142,12 @@ void Engine::processInstances() {
     List<int>* entities = Reg.getEntities<Instances>();
     if(entities ==nullptr)return;
     for (auto& id : *entities) {
+        
         Instances* inst = Reg.getComponent<Instances>(id);
         Mesh* mesh = Reg.getComponent<Mesh>(id);
-        float* buffer = new float[16 * inst->instances->len()];
+        float* buffer = new float[16 * inst->instances->len() ];
         float* copy = buffer;
+
 
         for (auto& x : *(inst->instances)) { 
             std::memcpy(copy, Reg.getComponent<Transform>(x)->model.list, 16*sizeof(float));
@@ -151,15 +156,16 @@ void Engine::processInstances() {
         }
 
 
+
         gpu->bindVertexArray(mesh->vao);
         gpu->createVertexBuffer(inst->instanceBuffer, buffer, 16 * inst->instances->len() * sizeof(float));
         delete[] buffer; 
 
 
-        gpu->structBuffer(2, 4, 16*sizeof(float), 0);
-        gpu->structBuffer(3, 4, 16*sizeof(float), 4);
-        gpu->structBuffer(4, 4, 16*sizeof(float), 8);
-        gpu->structBuffer(5, 4, 16*sizeof(float), 12);
+        gpu->structBuffer(2, 4, 16, 0);
+        gpu->structBuffer(3, 4, 16, 4);
+        gpu->structBuffer(4, 4, 16, 8);
+        gpu->structBuffer(5, 4, 16, 12);
 
         gpu->instanceDiviseur(2, 1);
         gpu->instanceDiviseur(3, 1);
@@ -193,17 +199,19 @@ void Engine::processInstances() {
                 //normal
                 gpu->structBuffer(3, 3, 8, 5);
 
-            }else {gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
-            gpu->structBuffer(0, 3, 6, 0);
-            if (data->is_normal) gpu->structBuffer(1, 3, 6, 3);
-            else gpu->structBuffer(1, 2, 6, 3);
+            }else {
+                gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
+                gpu->structBuffer(0, 3, 6, 0);
+                
+                if (data->is_normal) gpu->structBuffer(1, 3, 6, 3);
+                else gpu->structBuffer(1, 2, 6, 3);
             }
             
             gpu->createIndexBuffer(mesh->ebo, processed->indices, processed->indexCount * sizeof(unsigned int));
             mesh->vertex_count = processed->indexCount;
 
             freeProcessedMesh(processed);
-            
+            RessMan.unload(mesh->ressource);
 
         }
         
@@ -227,14 +235,15 @@ void Engine::processInstances() {
                 mat->shader = new unsigned int;
                 gpu->createShader(mat->shader, vert, frag);
                 mat->is_loaded = true;
-
+                RessMan.unload(mat->vert_index);
+                RessMan.unload(mat->frag_index);
 
             }
             catch(...){
 
 
                 Reg.addComponent<Material>(x);
-                if(Reg.hasComponent<Instances>(x))Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ;
+                if(Reg.hasComponent<Instances>(x)){Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ; std::cout <<"instance ouais ouais"<<std::endl;}
                 
                 else (Reg.getComponent<Material>(x))->shader = Settings::getDefaultShader();
                 (Reg.getComponent<Material>(x))->is_loaded = true;
@@ -260,6 +269,9 @@ void Engine::processInstances() {
 
         gpu->createShader(Settings::getDefaultShader(), default_vert_shader, default_frag_shader);
         gpu->createShader(Settings::getDefaultShaderInstanced(), default_vert_shader_instancing, default_frag_shader);
+        RessMan.unload(3);
+        RessMan.unload(4);
+        RessMan.unload(5);
         std::cout << " default material mcha"<<std::endl;
 
         std::cout <<std::endl;
@@ -277,7 +289,8 @@ void Engine::processInstances() {
 
         std::cout <<std::endl;
         std::cout << "initialising all systems"<<std::endl;
-        SysMan.initAllSystems(Reg);
+        
+        SysMan.initAllSystems();
         std::cout << "systemes initialisé"<<std::endl;
         std::cout <<std::endl;
 
@@ -309,16 +322,16 @@ void Engine::processInstances() {
     }
 
     void Engine::onStart(){
-        SysMan.startAllsystems(Reg);
+        SysMan.startAllsystems();
     }
 
     void Engine::onUpdate(){
-        SysMan.updateAllSystems(Reg);
+        SysMan.updateAllSystems();
     }
 
     void Engine::onExit(){
 
-        SysMan.shutdown(Reg);
+        SysMan.shutdown();
         std::cout << "Engine Shutting down"<<std::endl;
     }
 
@@ -331,8 +344,9 @@ void Engine::processInstances() {
         std::cout <<std::endl;
         std::cout << "main loop"<<std::endl;
         while(gpu->windowCheck()){
-            processEvents();
+            
             onUpdate();
+            processEvents();
             
         }
 
@@ -341,6 +355,7 @@ void Engine::processInstances() {
     }
     void Engine::processEvents(){
         gpu->events();
+        EvMan.processEvents();
     }
 
 

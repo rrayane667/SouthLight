@@ -177,10 +177,9 @@ namespace DATASTRUCT {
 	
 	template <typename T>
 	class Stack : public DynamicList<T>{
-		public:
-			void remove(int index) = delete;
-			void insert(int index, T& el) = delete;
-			T& operator[](int) = delete;
+		inline void remove(int index) {};
+		inline void insert(int index, T& el){};
+
 
 	};
 }

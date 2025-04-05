@@ -19,6 +19,7 @@ class Settings{
         static inline Settings* ptr = nullptr;
         static inline unsigned int* default_shader = new unsigned int;
         static inline unsigned int* default_shader_instanced = new unsigned int;
+        static inline float sensitivity = 0.2;
 
         Settings() {
 
@@ -43,6 +44,8 @@ class Settings{
 
         inline static unsigned int* getDefaultShader(){return default_shader;}
         inline static unsigned int* getDefaultShaderInstanced(){return default_shader_instanced;}
+
+        static float getSensi(){return sensitivity;}
 
         static void setRenderer(RENDERER_TYPE r) {
             renderer_type = r;

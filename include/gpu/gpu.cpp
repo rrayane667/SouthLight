@@ -6,7 +6,7 @@
 namespace GPU{
     GraphicsDevice* GraphicsDevice::getInstance(){
         RENDERER_TYPE t = Settings::getRendererType();
-        std::cout << "RENDERER : " << t << std::endl;
+
         if (t == GL_TYPE){
             
 

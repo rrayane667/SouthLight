@@ -40,7 +40,7 @@ namespace REG{
     };
 
     struct Transform : public Component{
-        inline Transform(int index) : Component(index) {scale = vec3(0.2f, 0.2f, 0.2f);}
+        inline Transform(int index) : Component(index) {scale = vec3(1.0f, 1.0f, 1.0f);}
         static inline std::string getComponentId()  {return "Transform";}
         vec3 position = vec3(0.0f, 0.0f, 0.0f);
         vec3 rotation = vec3(0.0f, 0.0f, 0.0f);
@@ -98,7 +98,7 @@ namespace REG{
     } ProjectionType;
 
     struct CameraPerspective{
-        float fov = 0.9f, ratio = 800.0f / 600.0f, n = 0.1f, f=100;
+        float fov = 0.9f, ratio = 800.0f / 600.0f, n = 0.1f, f=1000;
     };
     struct CameraOrthographique{
         float r=0, l=0, n=0, t=0, b=0, f=0;

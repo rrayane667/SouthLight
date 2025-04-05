@@ -13,6 +13,39 @@ namespace GPU{
     bool GL_GraphicsDevice::windowCheck(){
         return !glfwWindowShouldClose(reinterpret_cast<GLFWwindow*>(window));
     }
+    
+    void GL_GraphicsDevice::mouseEvents(EVENTS::EventManager& em) {
+        static double lastX = 0.0, lastY = 0.0;
+        double xPos, yPos;
+    
+        glfwGetCursorPos(reinterpret_cast<GLFWwindow*>(window), &xPos, &yPos);
+    
+
+        if (xPos != lastX || yPos != lastY) {
+
+            EVENTS::MouseMoveEvent* mouseEvent = new EVENTS::MouseMoveEvent(-(xPos - lastX), -(yPos - lastY)); 
+            em.publish(mouseEvent);
+    
+            lastX = xPos;
+            lastY = yPos;
+        }
+    }
+
+
+    void GL_GraphicsDevice::InputEvents(EVENTS::EventManager& em) {
+        GLFWwindow* glfwWindow = reinterpret_cast<GLFWwindow*>(window);
+    
+        for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; key++) {  // Loop through keys
+            if (glfwGetKey(glfwWindow, key) == GLFW_PRESS) {
+                
+                EVENTS::KeyPressEvent* keyEvent = new EVENTS::KeyPressEvent(key);
+                em.publish(keyEvent);
+                
+            }
+        }
+        
+        
+    }
 
     void GL_GraphicsDevice::initialisation(){
 
@@ -129,6 +162,8 @@ namespace GPU{
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, textureID);
     }
+    void GL_GraphicsDevice::setUniformTex(unsigned int& shaderID, const std::string& name, float value) {
+    glUniform1i(glGetUniformLocation(shaderID, name.c_str()), value);}
     
     void GL_GraphicsDevice::deleteTexture(unsigned int& textureID) {
         glDeleteTextures(1, &textureID);

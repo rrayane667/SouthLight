@@ -43,6 +43,7 @@ namespace GPU{
         void setUniform(unsigned int& shaderID, const std::string& name, const float* matrix) override;
         void setUniform(unsigned int& shaderID, const std::string& name, const vec3* vector) const override;
         void setUniform(unsigned int& shaderID, const std::string& name, float value) override;
+        void setUniformTex(unsigned int& shaderID, const std::string& name, float value);
 
         // ---- Textures ----
         void createTexture(unsigned int& textureID, int width, int height, int channels, const void* data) override;
@@ -62,6 +63,8 @@ namespace GPU{
 
 
         void events() override;
+        void InputEvents(EVENTS::EventManager& em) override;
+        void mouseEvents(EVENTS::EventManager& em) override;
         bool windowCheck() override;
 
         // ---- Synchronisation ----

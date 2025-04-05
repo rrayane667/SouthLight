@@ -334,14 +334,13 @@ namespace MATH {
 		w -= v.w;
 		return *this;
 	}
-	vec4& vec4::multi(const vec4& v) {
-		vec4 result;
-		result.x = y * v.z - z * v.y;
-		result.y = z * v.x - x * v.z;
-		result.z = x * v.y - y * v.x;
-		result.w = 0.0f;
-		*this = result;
-		return *this;
+	vec4 vec4::multi(const vec4& v) const {
+		return vec4(
+			y * v.z - z * v.y,  
+			z * v.x - x * v.z,  
+			x * v.y - y * v.x,  
+			v.w                
+		);
 	}
 	vec4& vec4::divide(const vec4& v) {
 		x /= v.x;
@@ -542,20 +541,47 @@ namespace MATH {
 		result.c4.z = -(2.0 * far * near) / (far - near);
 		return result;
 	}
+	vec3 vec3::cross(const vec3& v) const {
+		return vec3(
+			y * v.z - z * v.y,
+			z * v.x - x * v.z,
+			x * v.y - y * v.x
+		);
+	}
 
-	mat4 mat4::view(vec4 eye,  vec4 center,  vec4 up) {
+	mat4 mat4::view(vec3 eye, float pitch, float yaw) {
+		float cosPitch = cos(pitch);
+		float sinPitch = sin(pitch);
+		float cosYaw   = cos(yaw);
+		float sinYaw   = sin(yaw);
+	
 
-		vec4 f = (center - eye).normalize();
+		vec3 forward(
+			cosPitch * sinYaw,
+			sinPitch,
+			cosPitch * cosYaw
+		);
+	
+		forward = forward.normalize(); 
+	
 
-		vec4 s = (f*up).normalize();
+		vec3 worldUp(0, 1, 0);
+		vec3 right = worldUp.cross(forward).normalize();
+	
+	
+		vec3 up = forward.cross(right);
+	
 
-		vec4 u = (s* f);
+		float tx = -right.dot(eye);
+		float ty = -up.dot(eye);
+		float tz = -forward.dot(eye);
+	
 
 		return mat4(
-			s.x, u.x, -f.x, -s.dot(eye),
-			s.y, u.y, -f.y, -u.dot(eye),
-			s.z, u.z, -f.z, -f.dot(eye),
-			0, 0, 0, 1.0f
+			right.x,   right.y,   right.z,   tx,
+			up.x,      up.y,      up.z,      ty,
+			forward.x, forward.y, forward.z, tz,
+			0,         0,         0,         1.0f
 		);
 	}
 

@@ -1,6 +1,6 @@
 #include "systemmanager.h"
 #include "utilite/dataStruct.h"
-
+#include "system/scripts/mvt.h"
 using namespace DATASTRUCT;
 
 namespace SYSTEMS{
@@ -12,19 +12,31 @@ namespace SYSTEMS{
       
    }
 
-   void SystemManager::addSystem(SYSTEM s){
+   void SystemManager::addSystem(SYSTEM s, REG::Registry& r){
       if(systems_map.find(s) != systems_map.end()) return;
     if(s== RENDERER){
-        System* sys = new Renderer;
+        System* sys = new Renderer(em, r);
         systems.append(sys);
         systems_map[s] = sys;
     }
     if(s==TRANSFORMER){
-        System* sys = new Transformer;
+        System* sys = new Transformer(em, r);
         systems.append(sys);
     }
     if(s==INSTANCEUR){
-        System* sys = new Instanceur;
+        System* sys = new Instanceur(em, r);
+        systems.append(sys);
+    }
+    if(s==INPUT){
+        System* sys = new InputReading(em, r);
+        systems.append(sys);
+    }
+    if(s==MVT){
+        System* sys = new Mvt(em, r);
+        systems.append(sys);
+    }
+    if(s==CAMERA_CONTROL){
+        System* sys = new CameraController(em, r);
         systems.append(sys);
     }
 
@@ -32,28 +44,28 @@ namespace SYSTEMS{
    }
 
 
-   void SystemManager::initAllSystems(REG::Registry& reg){
+   void SystemManager::initAllSystems(){
     for(auto& x:systems){
         
-        x->onInit(reg);
+        x->onInit();
     }
    }
 
-   void SystemManager::startAllsystems(REG::Registry& reg){
+   void SystemManager::startAllsystems(){
     for(auto& x:systems){
         
-        x->onStart(reg);
+        x->onStart();
     }
    }
    
-   void SystemManager::updateAllSystems(REG::Registry& reg){
+   void SystemManager::updateAllSystems(){
     for(auto& x:systems){
         
-        x->update(reg);
+        x->update();
     }
    }
 
-   void SystemManager::shutdown(REG::Registry& reg){
+   void SystemManager::shutdown(){
     for(auto& x:systems){
         
         x->ondestroy();

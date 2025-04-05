@@ -19,7 +19,7 @@ namespace ENGINE {
 
     class Engine {
         SystemManager SysMan;
-        EventManager EvMan;
+        
         Registry Reg;
         RessourceManager RessMan;
         GraphicsDevice* gpu;// handles communication with gpu
@@ -35,6 +35,7 @@ namespace ENGINE {
         void onExit();
         void freeProcessedMesh(ProcessedMesh* mesh);
         public:
+        EventManager EvMan;
         void onInit();
         void onUpdate();
             Engine(RENDERER_TYPE type);
@@ -52,7 +53,7 @@ namespace ENGINE {
 
             void duplicate(int entity, const vec3& v);
 
-            inline void addSystem(SYSTEM s){return SysMan.addSystem(s);}
+            inline void addSystem(SYSTEM s){return SysMan.addSystem(s, Reg);}
 
             inline void setScale(float& x, float& y, float& z);
 

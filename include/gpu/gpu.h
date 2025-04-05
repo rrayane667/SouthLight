@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "maths/vec.h"
-
+#include "eventmanager/eventmanager.h"
 
 
 using namespace MATH; 
@@ -47,6 +47,7 @@ namespace GPU{
         virtual void setUniform(unsigned int& shaderID, const std::string& name, const float* matrix) = 0;
         virtual void setUniform(unsigned int& shaderID, const std::string& name, const vec3* vector)const= 0;
         virtual void setUniform(unsigned int& shaderID, const std::string& name, float value) = 0;
+        virtual void setUniformTex(unsigned int& shaderID, const std::string& name, float value) = 0;
 
         // ---- Textures ----
         virtual void createTexture(unsigned int& textureID, int width, int height, int channels, const void* data) = 0;
@@ -64,6 +65,8 @@ namespace GPU{
         virtual void color() = 0;
 
         virtual void events() = 0;
+        virtual void InputEvents(EVENTS::EventManager& em) = 0;
+        virtual void mouseEvents(EVENTS::EventManager& em) = 0;
         virtual bool windowCheck() = 0;
 
         // ---- Synchronisation ----

@@ -64,7 +64,7 @@ namespace MATH {
 
 	struct vec3 {
 		float x, y, z;
-
+		vec3 cross(const vec3& v) const ;
 		vec3();
 		inline vec3(const vec2& v){x=v.x; y=v.y; z=0;}
 		vec3(const float& x, const float& y, const float& z);
@@ -130,7 +130,7 @@ namespace MATH {
 
 		vec4& add(const vec4& v);
 		vec4& sub(const vec4& v);
-		vec4& multi(const vec4& v);
+		vec4 vec4::multi(const vec4& v) const;
 		vec4& divide(const vec4& v);
 
 		vec4 operator+(vec4 v);
@@ -164,6 +164,10 @@ namespace MATH {
 
 		void print();
 		float* vec4ToList();
+		friend std::ostream& operator<<(std::ostream& o, vec4 v){
+			o << "vec4 : " << v.x << ", " << v.y << ", " << v.z<< ", " << v.w;
+			return o;
+		}
 
 	};
 
@@ -175,6 +179,14 @@ namespace MATH {
 			};
 			float list[16];
 		};
+
+		friend std::ostream& operator<<(std::ostream& o, mat4 m){
+			o << "column1 : " << m.c1 << std::endl; 
+			o << "column2 : " << m.c2 << std::endl;
+			o << "column3 : " << m.c3 << std::endl;
+			o << "column4 : " << m.c4 << std::endl;
+			return o;
+		}
 
 		mat4();
 		mat4(const float& s);
@@ -206,7 +218,7 @@ namespace MATH {
 		mat4 transpose();
 		static mat4 rotation(vec4& axis, const float& angle);
 		static mat4 translation(const vec3& t);
-		static mat4 view(vec4 camera, vec4 center, vec4 up);
+		static mat4 view(vec3 eye, float pitch, float yaw);
 		static mat4 scale(const vec3& v);
 
 		mat4 operator+(mat4 v);
@@ -235,6 +247,7 @@ namespace MATH {
 
 		//remplacer par union apres
 		void print();
+		
 	};
 	
 }

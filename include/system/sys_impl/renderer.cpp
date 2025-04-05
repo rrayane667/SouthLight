@@ -1,22 +1,36 @@
 #include "system/system.h"
-#include "settings/settings.cpp"
+
 using namespace REG;
 
 
 namespace SYSTEMS{
     
-    Renderer::Renderer(){
+    Renderer::Renderer(EventManager& e, REG::Registry& r) : System(e, r) {
         std::cout << std::endl;
         std::cout << "Creating Renderer"<<std::endl;
         
         gpu = GraphicsDevice::getInstance();
-        std::cout << "Renderer tsawb"<<std::endl;
+        std::cout << "RENDERER tsawb"<<std::endl;
         std::cout<<std::endl;
 
         
     }   
+    void Renderer::updateCamera(){
+        float sensitivity = Settings::getInstance()->getSensi();
+        for(const auto& keyvalue: entities){
+            mat4 view = mat4::view(
+                camTrans->position, camTrans->rotation.x*3.1415* sensitivity/180, camTrans->rotation.y*3.1415* sensitivity/180
+            );
 
-    void Renderer::onInit(REG::Registry& reg){
+            List<int>* entite = keyvalue.second;
+            unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
+
+            gpu->setUniform(*shadeur, "view", view.list);
+        }
+    }
+
+    void Renderer::onInit(){
+        subscribe(CAMERA_TRANSFORM_UPDATE, Callback([this](Event* event){updateCamera();}));
         //init : load ressource into gpu based on the component/ stores vao into component
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();
@@ -40,7 +54,7 @@ namespace SYSTEMS{
         
     }
 
-    void Renderer::onStart(REG::Registry& reg){
+    void Renderer::onStart(){
         for(const auto& keyvalue: entities){
 
             mat4 projection;
@@ -48,26 +62,27 @@ namespace SYSTEMS{
             else projection = mat4::orthographic(cam->co->r, cam->co->l, cam->co->t, cam->co->b, cam->co->n, cam->co->f);
             
             mat4 view = mat4::view(
-                vec4(0.0f, 0.0f, 1.0f, 1.0f), 
-                vec4(camTrans->position.x, camTrans->position.y, camTrans->position.z, 1.0f), 
-                vec4(0.0f, 1.0f, 0.0f, 0.0f)  
+                camTrans->position, 0, 0
             );
+            
             
             List<int>* entite = keyvalue.second;
             unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
             gpu->useShader(*shadeur);
-            
-            gpu->setUniform(*shadeur, "projection", projection.list);
             gpu->setUniform(*shadeur, "view", view.list);
+            gpu->setUniform(*shadeur, "projection", projection.list);
+            
         }
     }
 
 
-    void Renderer::update(REG::Registry& reg){
+    void Renderer::update(){
+
+        
         
         for(const auto& keyvalue: entities){
             
-            
+
             List<int>* entite = keyvalue.second;
             unsigned int* shadeur = (reg.getComponent<Material>(entite->get(0)))->shader;
             gpu->useShader(*shadeur);
@@ -80,13 +95,18 @@ namespace SYSTEMS{
                 gpu->events();
                 
                 gpu->bindVertexArray(reg.getComponent<Mesh>(x)->vao);
+                int i =0;
                 for(auto& x: reg.getComponent<Material>(entite->get(0))->tex_components ){
-                    gpu->bindTexture(*x.second, 0);
+                    
+                    gpu->bindTexture(*x.second, i);
+                    gpu->setUniform(*shadeur, x.first, i++);
+                    
                 }
                 
 
-                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len());
+                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len() );
                 else{
+                    
                     gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);
                     gpu->drawIndexed(reg.getComponent<Mesh>(x)->vertex_count);
                 }
