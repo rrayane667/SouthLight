@@ -27,10 +27,14 @@ namespace RESSOURCES{
         
             Ressource* get(int ressource_index);
             Data* getData(int ressource_index){return get(ressource_index)->getData();}
+
+            //create the ressource class, reads data from memory
             void createRessource(int ressource_index);
             void load(int ressource_index);
             void unload(int ressource_index);
             void unloadAll();
+
+            void import(std::string path, std::string variant, std::string type);
             
             RessourceManager();
             ~RessourceManager();

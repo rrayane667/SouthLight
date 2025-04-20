@@ -48,27 +48,42 @@ namespace SYSTEMS{
     };
     class Instanceur : public System{
         public:
-            Instanceur(EventManager& e, REG::Registry& r) : System(e, r) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;}
+            Instanceur(EventManager& e, REG::Registry& r) : System(e, r) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;subscribe(INSTANCIATION, Callback([this] (Event* event){handleEvent(event);}));}
             inline void onInit() override {}
             inline void onStart() override{}
             inline void update() override {}
             inline void ondestroy() override {}
             inline SYSTEM getId() {return INSTANCEUR;}
 
-            inline void instance(REG::Registry& reg, int entity){
+            inline int instance( int entity){
                 reg.addComponent<Instances>(entity);
                 
                 Instances* inst = dynamic_cast<Instances*> (reg.getComponent<Instances>(entity));
                 if (!inst->instances->len()) inst->instances->append(entity);
-                inst->instances->append(reg.createEntity());
+                int e = reg.createEntity();
+                inst->instances->append(e);
+                return e;
 
+            }
+
+            inline void handleEvent(Event* event){
+
+                
+                Instanciation* i = dynamic_cast<Instanciation*>(event);
+                int new_entity = instance(i->entity);
+
+                Transform* t = dynamic_cast<Transform*> (reg.getComponent<Transform>(new_entity));
+                t->position = i->position;
+
+
+                em.publish(new TransformUpdate(new_entity));
             }
     };
 
     class Transformer : public System {
    
         public:
-            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;};
+            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}));};
             ~Transformer() = default;
         
 
@@ -94,8 +109,8 @@ namespace SYSTEMS{
             Transform* cam_trans;
             public:
 
-            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){}
-            inline void onInit() override {em.subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){handleEvent(event);}));cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
+            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){handleEvent(event);}));}
+            inline void onInit() override {cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
             inline void onStart() override {}
             inline void update() override{}
             inline void ondestroy() override{}
@@ -103,6 +118,7 @@ namespace SYSTEMS{
             inline SYSTEM getId() override{return RENDERER;}
             
             inline void handleEvent(Event* event) {
+                
                 KeyPressEvent* keyevent = dynamic_cast<KeyPressEvent*>(event);
                 if (!keyevent) {
                     std::cout << "Received non-key event" << std::endl;
@@ -156,6 +172,7 @@ namespace SYSTEMS{
         public:
             CameraController(EventManager& e, REG::Registry& r) : System(e,r) {
                 subscribe(MOUSE_MOVE, Callback([this](Event* e) { handleMouse(e); }));
+                std::cout << "Camera control setup" << std::endl;
             }
         
             void handleMouse(Event* event) {

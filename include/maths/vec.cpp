@@ -334,13 +334,14 @@ namespace MATH {
 		w -= v.w;
 		return *this;
 	}
-	vec4 vec4::multi(const vec4& v) const {
-		return vec4(
-			y * v.z - z * v.y,  
-			z * v.x - x * v.z,  
-			x * v.y - y * v.x,  
-			v.w                
-		);
+	vec4& vec4::multi(const vec4& v) {
+		int tx = y * v.z - z * v.y;
+		int ty = z * v.x - x * v.z;
+		int tz = x * v.y - y * v.x;
+		int w = v.w;
+
+		x = tx; y = ty; z = tz;
+		return *this;
 	}
 	vec4& vec4::divide(const vec4& v) {
 		x /= v.x;
@@ -430,7 +431,7 @@ namespace MATH {
 		return vec4(x * s, y * s, z * s, w * s);
 	}
 
-	vec4 vec4::operator/(const float& s) {
+	vec4 vec4::operator/(const float& s) const{
 
 		return vec4(x / s, y / s, z / s, w / s);
 	}
@@ -454,19 +455,20 @@ namespace MATH {
 		return this->divide(right);
 	}
 
-	void vec4::print() {
+	void vec4::print() const{
 		printf("%f %f %f %f \n", x, y, z, w);
 	}
 
-	float vec4::norme() {
+	float vec4::norme() const{
 		return (float) sqrt(x * x + y * y + z * z + w * w);
 	}
 
 	//alg func
-	vec4 vec4::normalize() {
-		if (!vec4::norme()) { printf("divisuin par 0 pour : "); (*this).print(); };
+	vec4 vec4::normalize() const{
+		if (!(*this).norme()) { printf("divisuin par 0 pour : "); (*this).print(); };
 		return (*this) / vec4::norme();
 	}
+
 	float vec4::dot(vec4& v) {
 		return x * v.x + y * v.y + z * v.z + w * v.w;
 	}
@@ -613,7 +615,7 @@ namespace MATH {
 		return trans;
 	}
 	
-	mat4 mat4::rotation(vec4& axis, const float& angle) {
+	mat4 mat4::rotation(const vec4& axis, const float& angle) {
 		vec4 normAxis = axis.normalize();
 		float cosA = cos(angle);
 		float sinA = sin(angle);

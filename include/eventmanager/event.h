@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
+#include "maths/vec.h"
 
+using namespace MATH;
 
 namespace EVENTS{
 
@@ -9,6 +11,7 @@ namespace EVENTS{
         TRANSFORM_UPDATE,
         CAMERA_TRANSFORM_UPDATE,
         MOUSE_MOVE,
+        INSTANCIATION,
     }EventType;
 
     struct Event{
@@ -51,5 +54,13 @@ namespace EVENTS{
     struct KeyReleaseEvent : public Event{
         KeyReleaseEvent(int k) {key = k;type = KEYBOARD_INPUT;}
         int key;
+    };
+
+    struct Instanciation : public Event{
+        int entity;
+        vec3 position;
+
+        inline Instanciation(int ent, vec3 pos){type = INSTANCIATION;entity = ent; position = pos;}
+        
     };
 }

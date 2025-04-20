@@ -3,8 +3,9 @@
 namespace REG{
 
     int Registry::createEntity(){
-
+        
         hierarchy->append(hierarchy->len());
+
         addComponent<Visibilite>(hierarchy->len());
         addComponent<Transform>(hierarchy->len());
 

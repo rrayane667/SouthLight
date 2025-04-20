@@ -10,10 +10,11 @@ namespace SYSTEMS{
             updateMatrix(x);
         }
 
-        subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}));
+        
     }
 
     void Transformer::updateMatrix( int& x){
+
 
         Transform *t = reg.getComponent<Transform>(x);
         

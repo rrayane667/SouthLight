@@ -19,7 +19,7 @@ class Settings{
         static inline Settings* ptr = nullptr;
         static inline unsigned int* default_shader = new unsigned int;
         static inline unsigned int* default_shader_instanced = new unsigned int;
-        static inline float sensitivity = 0.2;
+        static inline float sensitivity = 0.5;
 
         Settings() {
 

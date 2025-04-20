@@ -98,6 +98,7 @@ namespace SYSTEMS{
                 int i =0;
                 for(auto& x: reg.getComponent<Material>(entite->get(0))->tex_components ){
                     
+                    
                     gpu->bindTexture(*x.second, i);
                     gpu->setUniform(*shadeur, x.first, i++);
                     

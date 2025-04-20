@@ -6,12 +6,14 @@
 #include "gpu/gpu.h"
 #include "settings/settings.cpp"
 #include <vector>
+#include "scenemanager/scenemanager.h"
 
 using namespace EVENTS;
 using namespace REG;
 using namespace RESSOURCES;
 using namespace SYSTEMS;
 using namespace GPU;
+using namespace SCENES;
 
 
 namespace ENGINE {
@@ -23,7 +25,7 @@ namespace ENGINE {
         Registry Reg;
         RessourceManager RessMan;
         GraphicsDevice* gpu;// handles communication with gpu
-        //SceneManager SceneMan;
+        //SceneManager scene_manager;
 
         Settings* s;
 
@@ -62,6 +64,17 @@ namespace ENGINE {
             void processMeshes();
             void processInstances();
             void processTextures();
+
+
+            void storeMaterialArchetype(MaterialArchetype& mat);
+
+
+            //creates a material archetype
+            void createShader(int frag_ressource_index, int vert_ressource_index, std::string name);
+
+            void addMaterial(int entity, std::string shader_name);
+
+            void setShaderData(std::string shaderComponent, float data);
             
             static ProcessedMesh* processMesh(const MeshData& d);
 

@@ -6,21 +6,27 @@
 #include <functional>
 #include <vector>
 #include <cstring>
+#include "json/json.hpp"
+#include <fstream>
 
 using namespace REG;
-
+using json = nlohmann::json;
 
 
 namespace ENGINE{
     
 
-    Engine::Engine(RENDERER_TYPE type) : SysMan(EvMan), EvMan(), Reg(), RessMan() {
+    Engine::Engine(RENDERER_TYPE type) : EvMan(), SysMan(EvMan), Reg(), RessMan() {
         std::cout << "CStarting Engine..." << std::endl;
         s = Settings::getInstance();
         s->setRenderer(type);
        gpu =  GraphicsDevice::getInstance();
        std::cout << "Engine khdam" << std::endl;
        std::cout << std::endl;
+    }
+
+    void Engine::createShader(int frag_ressource_index, int vert_ressource_index, std::string name){
+
     }
 
     void Engine::freeProcessedMesh(ProcessedMesh* mesh) {
@@ -134,6 +140,7 @@ void Engine::processTextures(){
             
 
         }
+
     }
 
 }
@@ -192,12 +199,13 @@ void Engine::processInstances() {
                 gpu->structBuffer(0, 3, 3, 0);
 
             }else if(data->is_normal && data->is_uv){gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 9 * sizeof(float));
+                
                 //vertex
                 gpu->structBuffer(0, 3, 8, 0);
                 //uv
-                gpu->structBuffer(1, 2, 8, 3);
+                gpu->structBuffer(6, 2, 8, 3);
                 //normal
-                gpu->structBuffer(3, 3, 8, 5);
+                gpu->structBuffer(1, 3, 8, 5);
 
             }else {
                 gpu->createVertexBuffer(mesh->vbo, processed->vertices, processed->vertexCount * 6 * sizeof(float));
@@ -229,14 +237,14 @@ void Engine::processInstances() {
                 Material* mat;
                 mat = Reg.getComponent<Material>(x);
 
-                const char* vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->vert_index)))->shaderString;
-                const char* frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->frag_index)))->shaderString;
+                const char* vert = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->archetype->vert_index)))->shaderString;
+                const char* frag = (dynamic_cast<RESSOURCES::ShaderData*> (RessMan.getData(mat->archetype->frag_index)))->shaderString;
 
                 mat->shader = new unsigned int;
                 gpu->createShader(mat->shader, vert, frag);
                 mat->is_loaded = true;
-                RessMan.unload(mat->vert_index);
-                RessMan.unload(mat->frag_index);
+                RessMan.unload(mat->archetype->vert_index);
+                RessMan.unload(mat->archetype->frag_index);
 
             }
             catch(...){
@@ -257,6 +265,11 @@ void Engine::processInstances() {
 
 
     void Engine::onInit(){
+
+
+
+        
+
         std::cout <<std::endl;
         std::cout << "Creating default material"<<std::endl;
         //default shader. will be stored in settings class
@@ -294,6 +307,13 @@ void Engine::processInstances() {
         std::cout << "systemes initialisé"<<std::endl;
         std::cout <<std::endl;
 
+        std::cout << "processing events"<<std::endl;
+        EvMan.processEvents();
+        std::cout << "event processé"<<std::endl;
+        std::cout <<std::endl;
+
+        
+
         std::cout << "traitement des instances"<<std::endl;
         std::cout <<std::endl;
         processInstances();
@@ -308,12 +328,9 @@ void Engine::processInstances() {
     }
 
     void Engine::duplicate(int entity, const vec3& v){
-        Instanceur *inst = dynamic_cast<Instanceur*> (SysMan.getSystem(INSTANCEUR));
-
-        inst->instance(Reg, entity);
-
-        Transform* t = dynamic_cast<Transform*> ( Reg.getComponent<Transform>(Reg.entitiesCount()));
-        t->position = v;
+        
+        EvMan.publish(new Instanciation(entity, v));
+        EvMan.processEvents();
 
     }
 
@@ -322,7 +339,10 @@ void Engine::processInstances() {
     }
 
     void Engine::onStart(){
+
+    
         SysMan.startAllsystems();
+        
     }
 
     void Engine::onUpdate(){
@@ -353,6 +373,30 @@ void Engine::processInstances() {
         onExit();
         
     }
+
+    void Engine::storeMaterialArchetype(MaterialArchetype& material){
+        json jsonData = nlohmann::json{
+            {"shader_name", material.shader_name},
+            {"expected_input", material.expected_input},
+            {"frag_index", material.frag_index},
+            {"vert_index", material.vert_index}
+        };
+        //TO DO : makhssehach tb9a hardcodé
+        std::string path = "C:/Users/ORDI/Desktop/openGL/RessourceDirectory/materialtemplate/"+ material.shader_name;
+
+        std::ofstream outFile(path);
+
+   
+        outFile << jsonData.dump(4);
+        outFile.close();
+
+        
+        RessMan.import("\n"+path, "a", "mat");
+
+
+
+    }
+
     void Engine::processEvents(){
         gpu->events();
         EvMan.processEvents();

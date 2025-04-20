@@ -5,11 +5,13 @@
 #include "utilite/dataStruct.h"
 #include <unordered_map>
 
+
 using namespace DATASTRUCT;
 using namespace MATH;
 
+
 namespace REG{
-    struct Component{
+    struct Component {
         int instance_index;
         inline Component(int index){ instance_index = index;}
         virtual void aff(std::ostream& ) = 0;
@@ -70,6 +72,13 @@ namespace REG{
         }
     };
 
+    struct MaterialArchetype{
+        std::string shader_name;
+        std::unordered_map<std::string, std::string> expected_input;
+        int frag_index;
+        int vert_index;
+    };
+
  
 
     struct Material : public Component {
@@ -78,12 +87,10 @@ namespace REG{
         inline Material() : Component(-1) {is_loaded=false;}
 
         unsigned int* shader;
+        MaterialArchetype* archetype;
 
         std::unordered_map<std::string, float> float_components;
         std::unordered_map<std::string, unsigned int*> tex_components;
-
-        int frag_index;
-        int vert_index;
 
         bool is_loaded;
 

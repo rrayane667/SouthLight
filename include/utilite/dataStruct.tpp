@@ -27,7 +27,7 @@ namespace DATASTRUCT{
 
 	template <typename T>
 	DynamicList<T>& DynamicList<T>::operator=(const DynamicList<T>& dl){
-		if(dl==*this){return *this;}
+		if(dl.liste==(*this).liste){return *this;}
 		if constexpr (std::is_pointer_v<T>) {
 	
 			for (int i = 0; i <= current_index; i++) {
@@ -40,9 +40,9 @@ namespace DATASTRUCT{
 				(liste + i)->~T();
 			}
 		}
-		::operator delete[] liste;
-		max_size = dl->max_size;
-		current_index = dl->current_index;
+		::operator delete[] (liste);
+		max_size = dl.max_size;
+		current_index = dl.current_index;
 		liste = (T*) ::operator new[](max_size * sizeof(T)); 
 
 		for(int i = 0; i<=current_index; i++){
@@ -250,6 +250,21 @@ namespace DATASTRUCT{
 		while (sparse->len() < len) {
 			sparse->append(-1);
 		}
+	}
+
+	template <typename T>
+	Queue<T>::Queue(){
+		queue = new DynamicList<T>();
+	}
+
+	template <typename T>
+	void Queue<T>::append(T element){
+		queue.append(element);
+	}
+
+	template <typename T>
+	T Queue<T>::get(){
+		return queue->get(0);
 	}
 
 }

@@ -5,6 +5,8 @@
 #include <functional>
 
 
+// TO DO : propagation des events par ordre des couches
+
 namespace EVENTS{
 
     struct Callback{

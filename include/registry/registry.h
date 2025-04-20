@@ -12,7 +12,7 @@ namespace REG{
     
     class Registry{
         int total_nbr;
-        List<int> *hierarchy;//list de bitmask
+        List<int> *hierarchy;
         std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d 
 
         public:
@@ -98,6 +98,7 @@ namespace REG{
     template <typename T>
     T* Registry::getComponent(int entity_id) const{
         if(compReg->find(T::getComponentId()) == compReg->end()){
+            std::cout << T::getComponentId() << "hada makaynch" << std::endl;
             throw std::runtime_error("object doesnt have this component");
             
             

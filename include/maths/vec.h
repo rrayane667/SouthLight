@@ -130,7 +130,7 @@ namespace MATH {
 
 		vec4& add(const vec4& v);
 		vec4& sub(const vec4& v);
-		vec4 vec4::multi(const vec4& v) const;
+		vec4& multi(const vec4& v);
 		vec4& divide(const vec4& v);
 
 		vec4 operator+(vec4 v);
@@ -151,18 +151,18 @@ namespace MATH {
 		vec4 operator+(const float& s);
 		vec4 operator-(const float& s);
 		vec4 operator*(const float& s);
-		vec4 operator/(const float& s);
+		vec4 operator/(const float& s) const;
 
 		vec4& operator+=(const float& right);
 		vec4& operator-=(const float& right);
 		vec4& operator*=(const float& right);
 		vec4& operator/=(const float& right);
 
-		float norme();
-		vec4 normalize();
+		float norme() const;
+		vec4 normalize() const;
 		float dot(vec4& v);
 
-		void print();
+		void print() const;
 		float* vec4ToList();
 		friend std::ostream& operator<<(std::ostream& o, vec4 v){
 			o << "vec4 : " << v.x << ", " << v.y << ", " << v.z<< ", " << v.w;
@@ -216,7 +216,7 @@ namespace MATH {
 		
 
 		mat4 transpose();
-		static mat4 rotation(vec4& axis, const float& angle);
+		static mat4 rotation(const vec4& axis, const float& angle);
 		static mat4 translation(const vec3& t);
 		static mat4 view(vec3 eye, float pitch, float yaw);
 		static mat4 scale(const vec3& v);

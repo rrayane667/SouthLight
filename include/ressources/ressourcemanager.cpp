@@ -11,12 +11,14 @@ namespace RESSOURCES{
         std::cout << "Constructing Ressource manager..." << std::endl;
         Ressources = SparseSet<Ressource*>();
         Paths = new DynamicList<Trio<std::string>>();
+        
         FactoriesFunc["a"]["mesh"] = &AbstractFactory::createMeshData;
         FactoriesFunc["a"]["texture"] = &AbstractFactory::createTextureData;
         FactoriesFunc["a"]["texte"] = &AbstractFactory::createShaderData;
 
         Factories["a"] = new RessourceFactoryTypeA;
 
+        
         std::ifstream inputFile(manifest_path);
         
         std::string line;
@@ -79,6 +81,14 @@ namespace RESSOURCES{
             unload(i);
         }
 
+    }
+
+    void RessourceManager::import(std::string path, std::string variant, std::string type){
+        std::ofstream outfile;
+
+        outfile.open(manifest_path, std::ios_base::app); 
+        outfile << path + " " + type + " " + variant + "}";
+        outfile.close(); 
     }
 
     RessourceManager::~RessourceManager(){

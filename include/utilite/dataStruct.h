@@ -88,6 +88,15 @@ namespace DATASTRUCT {
 			}
 	};
 
+	template <typename T>
+	class Queue{
+		List<T> *queue;
+		public:
+		Queue();
+		void append(T element);
+		T get();
+	};
+
 
 	template <typename T, typename U>
 	class paire : public std::pair<T, U> {
