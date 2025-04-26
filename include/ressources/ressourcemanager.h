@@ -35,6 +35,7 @@ namespace RESSOURCES{
             void unloadAll();
 
             void import(std::string path, std::string variant, std::string type);
+            void exportData(Data* data, std::string variant, std::string type);
             
             RessourceManager();
             ~RessourceManager();

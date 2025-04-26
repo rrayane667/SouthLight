@@ -1,7 +1,7 @@
 #pragma once
 #include "utilite/dataStruct.h"
 #include "maths/vec.h"
-
+#include <unordered_map>
 #include "stb_image.h"
 
 using namespace DATASTRUCT;
@@ -63,6 +63,64 @@ namespace RESSOURCES
         unsigned char* data ;
         int width, height, nrchannels;
     };
+
+    struct MaterialArchetypeData : public Data{
+        inline MaterialArchetypeData() {vert_index = 3; frag_index = 4; shader_name = "default shader";}
+        inline MaterialArchetypeData(const MaterialArchetypeData& td) {
+            vert_index = td.vert_index;
+            frag_index = td.frag_index;
+            shader_name = td.shader_name;
+            expected_input = td.expected_input;
+        }
+        inline ~MaterialArchetypeData() override {}
+        inline Data* clone() const override{
+            MaterialArchetypeData* td = new MaterialArchetypeData(*this);
+            return td;
+        }
+        std::string shader_name;
+        std::unordered_map<std::string, char> expected_input;
+        int frag_index;
+        int vert_index;
+
+    };
+
+    struct GameObjectData : public Data{
+        inline GameObjectData() = default;
+        inline GameObjectData(std::string& j) {json_game_object_data =j ;}
+        inline GameObjectData(const GameObjectData& td) {json_game_object_data = td.json_game_object_data;}
+        inline ~GameObjectData() override {}
+        inline Data* clone() const override{
+            GameObjectData* td = new GameObjectData(*this);
+            return td;
+        }
+
+        std::string json_game_object_data;
+    };
+    struct ComponentData : public Data{
+        inline ComponentData() = default;
+        inline ComponentData(const ComponentData& td) {json_component_data = td.json_component_data;}
+        inline ~ComponentData() override {}
+        inline Data* clone() const override{
+            ComponentData* td = new ComponentData(*this);
+            return td;
+        }
+        std::string component_type;
+
+        std::string json_component_data;
+    };
+    struct SceneData : public Data{
+        inline SceneData() {gameobjects = new DynamicList<int>();};
+        inline SceneData(const SceneData& td) {*gameobjects = *td.gameobjects;}
+        inline ~SceneData() override {}
+        inline Data* clone() const override{
+            SceneData* td = new SceneData(*this);
+            return td;
+        }
+        List<int>* gameobjects;
+    };
+
+
+
 
 
 } 

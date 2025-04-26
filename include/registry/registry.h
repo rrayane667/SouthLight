@@ -21,6 +21,8 @@ namespace REG{
             int createEntity();
             void destroyEntity(int entity_id);
 
+            inline std::unordered_map<std::string,SparseSet<Component*>> * getComponents() const{return compReg;}
+
             template <typename T>
             inline bool hasComponent(int entity){return ((*compReg).find(T::getComponentId()) != compReg->end()) && ((*compReg)[T::getComponentId()].getIndex(entity)!=-1);}
 

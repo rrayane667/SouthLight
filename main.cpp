@@ -39,10 +39,8 @@ int main(int, char**){
         for(int j = 0; j <= n; j++){
             for(int k = 0; k <= n; k++){
 
-
                 stpKhdm.duplicate(object, vec3(30*i/n - 150, 30*j/n - 150, 29*k/n + 10));    
-                
-                
+
             }
         }
     }

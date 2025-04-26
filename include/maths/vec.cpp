@@ -2,8 +2,17 @@
 #include <stdio.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "json/json.hpp"
 
 namespace MATH {
+	void from_json( nlohmann::json& j,  vec3& v) {
+		j.at("x").get_to(v.x);
+		j.at("y").get_to(v.y);
+		j.at("z").get_to(v.z);
+	}
+	void to_json(nlohmann::json& j,  vec3& v) {
+		j = nlohmann::json{{"x", v.x}, {"y", v.y}, {"z", v.z}};
+	}
 	vec2::vec2() {
 		x = 0;
 		y = 0;

@@ -7,6 +7,7 @@ project(Engine VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 
+
 # Collect source files
 file(GLOB_RECURSE ENGINE_SOURCES
     "${CMAKE_SOURCE_DIR}/include/*.cpp"
@@ -29,6 +30,15 @@ set(GLFW_LIB "${CMAKE_SOURCE_DIR}/lib/libglfw3dll.a")
 # Create the main engine application.
 add_executable(EngineApp "${CMAKE_SOURCE_DIR}/main.cpp")
 target_link_libraries(EngineApp PUBLIC EngineSource glad ${GLFW_LIB} opengl32)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    target_compile_options(EngineSource PRIVATE
+        -fms-extensions
+        -fms-compatibility
+        -fdelayed-template-parsing   # important for template ctors
+    )
+endif()
+
 
 # Testing Framework (Catch2)
 add_library(catch INTERFACE)

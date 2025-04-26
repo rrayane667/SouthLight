@@ -52,6 +52,7 @@ namespace DATASTRUCT {
 			
 			
 			DynamicList(DynamicList<T>* l){copy(*l);};
+			DynamicList(List<T>* l){copy(*l);};
 			DynamicList<T>& operator=(const DynamicList<T>& dl);
 
 			inline T* begin() override { return liste; } 

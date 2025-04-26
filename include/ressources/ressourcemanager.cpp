@@ -15,7 +15,10 @@ namespace RESSOURCES{
         FactoriesFunc["a"]["mesh"] = &AbstractFactory::createMeshData;
         FactoriesFunc["a"]["texture"] = &AbstractFactory::createTextureData;
         FactoriesFunc["a"]["texte"] = &AbstractFactory::createShaderData;
-
+        FactoriesFunc["a"]["material"] = &AbstractFactory::createMaterialArchetypeData;
+        FactoriesFunc["a"]["gameobject"] = &AbstractFactory::createGameObjectData;
+        FactoriesFunc["a"]["scene"] = &AbstractFactory::createSceneData;
+        FactoriesFunc["a"]["component"] = &AbstractFactory::createComponentData;
         Factories["a"] = new RessourceFactoryTypeA;
 
         
@@ -93,6 +96,18 @@ namespace RESSOURCES{
 
     RessourceManager::~RessourceManager(){
         delete Paths;
+    }
+
+    void RessourceManager::exportData(Data* data, std::string variant, std::string type){
+        if (data == nullptr){std::cerr << "Cannot export data, nullptr provided" << std::endl; return;}
+        std::string path = Paths->get(data->ressource_index)[0];
+        std::ofstream outfile(path);
+        if (!outfile.is_open()) {
+            std::cerr << "Error opening file for writing (data export) : " << path << std::endl;
+            return;
+        }
+        outfile << data->name + " " + type + " " + variant + "}";
+        outfile.close(); 
     }
 
 }

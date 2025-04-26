@@ -72,8 +72,10 @@ namespace ENGINE {
             //creates a material archetype
             void createShader(int frag_ressource_index, int vert_ressource_index, std::string name);
 
+            //adds a material to an entity
             void addMaterial(int entity, std::string shader_name);
 
+            //choisi les textures/ float a utilisé (uniforms) pour chaque shader (texture defini par son ressource index(int))
             void setShaderData(std::string shaderComponent, float data);
             
             static ProcessedMesh* processMesh(const MeshData& d);

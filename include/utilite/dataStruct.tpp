@@ -1,7 +1,24 @@
 #include "dataStruct.h"
 #include<iostream>
+#include "json/json.hpp"
 
+using json = nlohmann::json;
 namespace DATASTRUCT{
+
+
+	template <typename T>
+	void to_json(json& j, const List<T>& l) {
+		j = json::array();
+		for (auto& x: l) {
+			j.push_back(l);
+		}
+	}
+	template <typename T>
+	void from_json(const json& j, List<T>& l) {
+    for (std::size_t i = 0; i < j.size(); ++i) {
+        l.append(j.at(i).get<T>());
+    }
+}
 
 
 	

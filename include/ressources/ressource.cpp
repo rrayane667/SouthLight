@@ -6,6 +6,7 @@ namespace RESSOURCES{
     {
         data = nullptr;
         loader = loadr_arg;
+        (*this).id = id;
     }
 
     Ressource::~Ressource() {

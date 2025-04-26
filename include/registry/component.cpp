@@ -74,9 +74,14 @@ namespace REG{
 
     struct MaterialArchetype{
         std::string shader_name;
-        std::unordered_map<std::string, std::string> expected_input;
+        std::unordered_map<std::string, char> expected_input;
         int frag_index;
         int vert_index;
+    };
+
+    struct tex_index_ressource{
+        int index;
+        unsigned int* texture;
     };
 
  
@@ -88,9 +93,10 @@ namespace REG{
 
         unsigned int* shader;
         MaterialArchetype* archetype;
+        int archetype_index_ressource;
 
         std::unordered_map<std::string, float> float_components;
-        std::unordered_map<std::string, unsigned int*> tex_components;
+        std::unordered_map<std::string, tex_index_ressource> tex_components;
 
         bool is_loaded;
 

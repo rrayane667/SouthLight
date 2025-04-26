@@ -4,7 +4,7 @@
 
 
 namespace MATH {
-
+	
 
 	struct vec2 {
 		float x, y;
@@ -245,10 +245,12 @@ namespace MATH {
 		mat4& operator*=(const float& right);
 		mat4& operator/=(const float& right);
 
-		//remplacer par union apres
 		void print();
 		
 	};
+	//remplacer par union apres
 	
+	void from_json( nlohmann::json& j,  vec3& v);
+	void to_json(nlohmann::json& j,  vec3& v);
 }
 
