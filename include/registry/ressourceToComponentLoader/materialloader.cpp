@@ -79,11 +79,11 @@ namespace REG{
             return j;
         }
 
-        void MaterialLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
+        int MaterialLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
             json j = exportjson(reg, entity);
             ComponentData* data = new ComponentData;
             data->component_type = "Material";
             data->json_component_data = j.dump(4);
-            ress_man.exportData(data, "component", variant);
+            return ress_man.exportData(data, "component", variant);
         }
 }

@@ -11,22 +11,37 @@ namespace RESSOURCES{
         }
         
     }
-    void MaterialArchetypeLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
+    std::string MaterialArchetypeLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
         if (type_variant == "a"){
-            MaterialArchetypeLoader::jsonExport(path, dynamic_cast<MaterialArchetypeData&> (*data));
+            return MaterialArchetypeLoader::jsonExport(path, dynamic_cast<MaterialArchetypeData&> (*data));
         }
+        std::cerr << "Unknown type_variant: " << type_variant << std::endl;
+        return "";
         
     }
-    void MaterialArchetypeLoader::jsonExport(const std::string& path, MaterialArchetypeData& data){
+    std::string MaterialArchetypeLoader::jsonExport(const std::string& path, MaterialArchetypeData& data){
         json jsonData = nlohmann::json{
             {"shader_name", data.shader_name},
             {"expected_input", data.expected_input},
             {"frag_index", data.frag_index},
             {"vert_index", data.vert_index}
         };
-        std::ofstream outFile(path+"/"+data.name);
-        outFile << jsonData.dump(4); // pretty print with 4 spaces
-        outFile.close();
+
+        int i =0;
+        std::string filename;
+        do {
+            filename = path + "/" + data.name + std::to_string(i++) + ".json";
+        } while (std::filesystem::exists(filename));
+
+        
+        std::ofstream outputFile(filename);
+        if (!outputFile.good()){
+            std::cerr << "Cannot open file: " << path << '\n';
+            return "";
+        }
+        outputFile << jsonData.dump(4); 
+        outputFile.close();
+        return path + "/" + data.name + std::to_string(i) + ".json";
     }
 
     

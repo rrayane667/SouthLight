@@ -1,4 +1,4 @@
-#include "json/json.hpp"
+#include <sstream>
 #include "ressources/utility/ressourceutility.h"
 #include <fstream>
 
@@ -16,22 +16,36 @@ namespace RESSOURCES{
             std::cerr << "Cannot open file: " << path << '\n';
             return;
         }
-        data.json_game_object_data = json::parse(inputFile)["data"];
+        std::stringstream buffer;
+
+	    buffer << inputFile.rdbuf();
+        data.json_game_object_data = buffer.str();
     }
 
-    void GameObjectLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
+    std::string GameObjectLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
         if (type_variant == "a"){
-            GameObjectLoader::gameObjectExport(path, dynamic_cast<GameObjectData&> (*data));
+            return GameObjectLoader::gameObjectExport(path, dynamic_cast<GameObjectData&> (*data));
         }
+        std::cerr << "type variant doesnt exist : " << type_variant << '\n';
+        return"";
     }
-    void GameObjectLoader::gameObjectExport(const std::string& path,  GameObjectData& data){
-        std::ofstream outputFile(path);
+    std::string GameObjectLoader::gameObjectExport(const std::string& path,  GameObjectData& data){
+        
+        
+        
+        int i = 0;
+        std::string filename;
+        do {
+            filename = path + "/" + data.name + std::to_string(i++) + ".json";
+        } while (std::filesystem::exists(filename));
+        std::ofstream outputFile(filename);
         if (!outputFile.good()){
             std::cerr << "Cannot open file: " << path << '\n';
             return;
         }
-        json j;
-        j["data"] = data.json_game_object_data;
-        outputFile << j.dump(4);
+        std::ofstream outputFile(filename);
+        outputFile << data.json_game_object_data;
+        outputFile.close();
+        return path+"/"+data.name +std::to_string(i) +".json";
     }
 } 

@@ -9,10 +9,18 @@ using namespace DATASTRUCT;
 
 
 namespace REG{
+
+    struct GameObjectInfo{
+        int entity_ressource_id = -1;
+        int entity_id;
+        std::string name = "Entity";
+        GameObjectInfo(int entity) : entity_id(entity) {};
+        GameObjectInfo(int entity, int ress_id, std::string n) : entity_id(entity), entity_ressource_id(ress_id), name(n) {}
+    };
     
     class Registry{
         int total_nbr;
-        List<int> *hierarchy;
+        List<GameObjectInfo> *hierarchy;
         std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d 
 
         public:
@@ -27,6 +35,12 @@ namespace REG{
             inline bool hasComponent(int entity){return ((*compReg).find(T::getComponentId()) != compReg->end()) && ((*compReg)[T::getComponentId()].getIndex(entity)!=-1);}
 
             inline int entitiesCount() const{return hierarchy->len();}
+
+            inline int getEntityRessourceId(int entity) const {return hierarchy->get(entity).entity_ressource_id;}
+            inline std::string getEntityName(int entity) const {return hierarchy->get(entity).name;}
+
+            inline void setEntityRessourceId(int entity, int ressource_id) {hierarchy->get(entity).entity_ressource_id = ressource_id;}
+            inline void setEntityName(int entity, std::string name) {hierarchy->get(entity).name = name;}
 
             //checks if the entity exists
             inline bool checkEntity(int entity)const {return entity < hierarchy->len(); }
@@ -90,6 +104,10 @@ namespace REG{
 
     template <typename T>
     void Registry::addComponent(int entity_id){
+        if(entity_id >= hierarchy->len()){
+            std::cerr << "Error: entity does not exist : " << entity_id << std::endl;
+            return;
+        }
         if(compReg->find(T::getComponentId()) == compReg->end()){
             (*compReg)[T::getComponentId()] = SparseSet<Component*>();
         }

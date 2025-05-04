@@ -13,13 +13,13 @@ namespace SYSTEMS{
         
     }
 
-    void Transformer::updateMatrix( int& x){
+    bool Transformer::updateMatrix( int& x){
 
 
         Transform *t = reg.getComponent<Transform>(x);
         
         t->model = mat4::translation(t->position)*mat4::rotation(vec4(0,0,1,0),t->rotation.z)*mat4::rotation(vec4(0,1,0,0),t->rotation.y)*mat4::rotation(vec4(1,0,0,0),t->rotation.x)*mat4::scale(t->scale);
-
+        return true;
     }
 
     void Transformer::setPosition(int entity, const vec3& v){

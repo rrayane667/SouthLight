@@ -22,7 +22,7 @@ namespace REG{
             virtual ~ComponentLoader() = default;
             virtual void loadComponent(Registry& reg, int entity,  int index, RESSOURCES::RessourceManager& ress_man) = 0;   
             virtual void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) = 0;
-            virtual void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) = 0;
+            virtual int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) = 0;
             virtual json& exportjson(Registry& reg, int entity) = 0;
         };
 
@@ -43,6 +43,8 @@ namespace REG{
             if(loaders.find(component_type) != loaders.end()){
                 
                 loaders[component_type]->loadComponent(reg, entity, json::parse(data->json_component_data),ress_man);
+            }else{
+                std::cerr << "Error: component type not found : " << component_type <<std::endl;
             }
         }
 
@@ -52,6 +54,8 @@ namespace REG{
             if(loaders.find(j["type"]) != loaders.end()){
                 
                 loaders[j["type"]]->loadComponent(reg, entity, j["data"],ress_man);
+            }else{
+                std::cerr << "Error: component type not found : " << j["type"] <<std::endl;
             }
         }
 
@@ -61,6 +65,15 @@ namespace REG{
             }
             std::cerr << "Error: component type not found : " << type <<std::endl;
             return json::object();
+            
+        }
+
+        inline static int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string type, std::string variant){
+            if(loaders.find(type) != loaders.end()){
+                return loaders[type]->exportComponent(reg, entity, ress_man, variant);
+            }
+            std::cerr << "Error: component type not found : " << variant <<std::endl;
+            return -1;
             
         }
     };
@@ -75,7 +88,7 @@ namespace REG{
         json& exportjson(Registry& reg, int entity) override;
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
         void loadComponent(Registry& reg, int entity,  int index, RESSOURCES::RessourceManager& ress_man) override;
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
         };
     
     
@@ -87,7 +100,7 @@ namespace REG{
         json& exportjson(Registry& reg, int entity) override;
         void loadComponent(Registry& reg, int entity,  int index, RESSOURCES::RessourceManager& ress_man) override;
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
     };
 
     class VisibiliteLoader : public ComponentLoader {
@@ -98,7 +111,7 @@ namespace REG{
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
         void loadComponent(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress_man) override;
 
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
     };
 
     class TransformLoader : public ComponentLoader {
@@ -109,7 +122,7 @@ namespace REG{
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
         void loadComponent(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress_man ) override;
 
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
     };
 
     //add support for static meshes
@@ -123,7 +136,7 @@ namespace REG{
         json& exportjson(Registry& reg, int entity) override;
         void loadComponent(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress_man ) override;
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
     };
 
     class MaterialLoader : public ComponentLoader {
@@ -135,7 +148,7 @@ namespace REG{
     //only takes ComponentData as input
         void loadComponent(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress) override;
         void loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man) override;
-        void exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
+        int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) override;
         
     };
 

@@ -34,10 +34,12 @@ namespace REG{
     json& GameobjectLoader::exportjson(Registry& reg, int entity) {
         json j;
         j["type"] = "GameObject";
-        j["data"]["Components"] = json::array();
+        j["Components"] = json::array();
         for (auto& component : *reg.getComponents()) {
             if (component.second.getIndex(entity) != -1) {
-                json component_json = ObjectLoader::exportjson(reg, entity, component.first);
+                json component_json ;
+                component_json["data"] = ObjectLoader::exportjson(reg, entity, component.first);
+                component_json["type"] = component.first;
                 j["data"]["Components"].push_back(component_json);
             }
         
@@ -45,10 +47,10 @@ namespace REG{
         return j;
     }
 
-    void GameobjectLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
+    int GameobjectLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
         json j = exportjson(reg, entity);
         GameObjectData* data = new GameObjectData;
         data->json_game_object_data = j.dump(4);
-        ress_man.exportData(data, "gameobject", variant);
+        return ress_man.exportData(data, "gameobject", variant);
     }
 }

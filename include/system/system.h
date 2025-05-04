@@ -66,7 +66,7 @@ namespace SYSTEMS{
 
             }
 
-            inline void handleEvent(Event* event){
+            inline bool handleEvent(Event* event){
 
                 
                 Instanciation* i = dynamic_cast<Instanciation*>(event);
@@ -77,13 +77,14 @@ namespace SYSTEMS{
 
 
                 em.publish(new TransformUpdate(new_entity));
+                return true;
             }
     };
 
     class Transformer : public System {
    
         public:
-            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}));};
+            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {return updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}));};
             ~Transformer() = default;
         
 
@@ -100,7 +101,7 @@ namespace SYSTEMS{
             void setPosition(int entity, const vec3& v);
             void setRotation(int entity, const vec3& v);
             void setScale(int entity, const vec3& v);
-            void updateMatrix( int& x);
+            bool updateMatrix( int& x);
         
 
         };
@@ -109,7 +110,7 @@ namespace SYSTEMS{
             Transform* cam_trans;
             public:
 
-            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){handleEvent(event);}));}
+            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){return handleEvent(event);}));}
             inline void onInit() override {cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
             inline void onStart() override {}
             inline void update() override{}
@@ -117,12 +118,12 @@ namespace SYSTEMS{
     
             inline SYSTEM getId() override{return RENDERER;}
             
-            inline void handleEvent(Event* event) {
+            inline bool handleEvent(Event* event) {
                 
                 KeyPressEvent* keyevent = dynamic_cast<KeyPressEvent*>(event);
                 if (!keyevent) {
                     std::cout << "Received non-key event" << std::endl;
-                    return;
+                    return false;
                 }
                 float sensitivity = Settings::getSensi();
                 Transform* trans = reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));
@@ -142,7 +143,7 @@ namespace SYSTEMS{
                 vec3 worldUp(0, 1, 0);
                 vec3 right = forward.cross(worldUp).normalize();
                 vec3 up = right.cross(forward).normalize();  // optional, useful for flying
-            
+                
                 switch (keyevent->key) {
                     case 87: // Z
                         trans->position += forward*speed;
@@ -160,7 +161,9 @@ namespace SYSTEMS{
             
                 if (keyevent->key >= 65 && keyevent->key <= 90) {
                     publish(new CameraTransformUpdate());
+                    return true;
                 }
+                return false;
             }
         };
 
@@ -171,11 +174,11 @@ namespace SYSTEMS{
         
         public:
             CameraController(EventManager& e, REG::Registry& r) : System(e,r) {
-                subscribe(MOUSE_MOVE, Callback([this](Event* e) { handleMouse(e); }));
+                subscribe(MOUSE_MOVE, Callback([this](Event* e) { return handleMouse(e); }));
                 std::cout << "Camera control setup" << std::endl;
             }
         
-            void handleMouse(Event* event) {
+            bool handleMouse(Event* event) {
                 
                 auto* mouseEvent = dynamic_cast<const MouseMoveEvent*>(event);
                 if (!mouseEvent) return;
@@ -193,6 +196,7 @@ namespace SYSTEMS{
                 reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0) )->rotation = vec3(pitch, yaw, 0); 
                 CameraTransformUpdate* c = new CameraTransformUpdate();
                 publish(c);
+                return true;
 
             }
             void onInit() override {}
@@ -245,7 +249,7 @@ namespace SYSTEMS{
 
             inline SYSTEM getId() override{return RENDERER;}
 
-            void updateCamera();
+            bool updateCamera();
     };
 
 

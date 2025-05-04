@@ -36,4 +36,32 @@ namespace RESSOURCES{
         }
         delete go;
     }
+    std::string SceneLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
+        if (type_variant == "a"){
+            return SceneLoader::sceneExport(path, dynamic_cast<SceneData&> (*data));
+        }
+        std::cerr << "Unknown type variant for export: " << type_variant << std::endl;
+        return "";
+        
+    }
+    std::string SceneLoader::sceneExport(const std::string& path, SceneData& data){
+
+        int i = 0;
+        std::string filename;
+        do {
+            filename = path + "/" + data.name + std::to_string(i++) + ".scene";
+        } while (std::filesystem::exists(filename));
+        std::ofstream outFile(filename);
+        if (!outFile.good()){
+            std::cerr << "Cannot open file: " << filename << '\n';
+            return "";
+        }
+        for(auto& x : *data.gameobjects){
+            outFile << x << " ";
+        }
+        outFile<< "\n";
+        outFile.close();
+        std::cout << "Scene exported to: " + path + "/" + data.name + std::to_string(i++) + ".scene" << '\n';
+        return path+"/"+data.name +std::to_string(i) + ".scene";
+    }
 }

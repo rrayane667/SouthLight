@@ -16,10 +16,12 @@ namespace RESSOURCES{
         
     }
 
-    void MeshLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
+    std::string MeshLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
         if (type_variant == "a"){
-            MeshLoader::_objExport(path, dynamic_cast<MeshData&> (*data));
+            return MeshLoader::_objExport(path, dynamic_cast<MeshData&> (*data));
         }
+        std::cerr << "Unknown type variant for export: " << type_variant << std::endl;
+        return "";
         
     }
 
@@ -99,14 +101,23 @@ namespace RESSOURCES{
 
     }
 
-    void MeshLoader::_objExport(const std::string& path, MeshData& data){
-        std::ofstream outFile(path+"/"+data.name+".obj");
+    std::string MeshLoader::_objExport(const std::string& path, MeshData& data){
+
         int i = 1;
         //check if file with that name already exists
-        while(outFile.good()){
-            outFile.close();
-            outFile.open(path+"/"+data.name +std::to_string(i) +".obj");
-            i++;
+        std::string filename;
+        do {
+            filename = path + "/" + data.name + std::to_string(i++) + ".json";
+        } while (std::filesystem::exists(filename));
+
+  
+        
+
+        
+        std::ofstream outFile(filename);
+        if (!outFile.good()){
+            std::cerr << "Cannot open file: " << path << '\n';
+            return "";
         }
 
         for(auto& x : *data.vertices){
@@ -143,5 +154,7 @@ namespace RESSOURCES{
             
         
         }
+        outFile.close();
+        return path+"/"+data.name +std::to_string(i) +".obj";
     }
 }

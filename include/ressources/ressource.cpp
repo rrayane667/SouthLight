@@ -27,5 +27,13 @@ namespace RESSOURCES{
             is_loaded = false;   
         }
     }
+
+    std::string Ressource::exportRessource(const std::string& path_arg)  {
+        if (data) {
+            return loader->exportRessource(path_arg, data, type_variant);
+        }
+        std::cerr << "Data is null, cannot export ressource" << std::endl;
+        return ""; 
+    }
 }
 

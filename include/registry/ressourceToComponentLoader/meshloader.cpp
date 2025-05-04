@@ -175,12 +175,12 @@ namespace REG{
         j["mesh_ressource_index"] = mesh->ressource;
         return j;
     }
-    void MeshLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
+    int MeshLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){
         json j = exportjson(reg, entity);
         ComponentData* data = new ComponentData;
         data->component_type = "Mesh";
         data->json_component_data = j.dump(4);
-        ress_man.exportData(data, "component", variant);
+        return ress_man.exportData(data, "component", variant);
     }
 
     

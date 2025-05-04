@@ -4,7 +4,7 @@ namespace REG{
 
     int Registry::createEntity(){
         
-        hierarchy->append(hierarchy->len());
+        hierarchy->append(GameObjectInfo(hierarchy->len(), -1,"Entity"+std::to_string(hierarchy->len())));
 
         addComponent<Visibilite>(hierarchy->len());
         addComponent<Transform>(hierarchy->len());
@@ -28,7 +28,7 @@ namespace REG{
     Registry::Registry(){
         total_nbr = 1;
         std::cout << "Constructing Registry..." << std::endl;
-        hierarchy = new DynamicList<int>();
+        hierarchy = new DynamicList<GameObjectInfo>();
         compReg = new std::unordered_map<std::string,SparseSet<Component*>>;
         std::cout << "Registry constructed." << std::endl;
         std::cout << std::endl;

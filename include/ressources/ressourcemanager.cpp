@@ -48,7 +48,7 @@ namespace RESSOURCES{
         if(ressource_index >= Paths->len()) throw std::runtime_error("zbi ra makaynch had lfichier ");
 
         if (Ressources.getIndex(ressource_index) ==-1){
-            createRessource(ressource_index);
+        createRessource(ressource_index);
 
         }
 
@@ -98,16 +98,22 @@ namespace RESSOURCES{
         delete Paths;
     }
 
-    void RessourceManager::exportData(Data* data, std::string variant, std::string type){
+    int RessourceManager::exportData(Data* data, std::string type, std::string variant){
         if (data == nullptr){std::cerr << "Cannot export data, nullptr provided" << std::endl; return;}
-        std::string path = Paths->get(data->ressource_index)[0];
-        std::ofstream outfile(path);
+        Ressource* res = (Factories[variant]->*FactoriesFunc[variant][type])("", -1);
+        std::string path = res->exportRessource(project_file_path + "/" + type);
+        res->setPath(path);
+
+        std::ofstream outfile(manifest_path, std::ios_base::app);
         if (!outfile.is_open()) {
-            std::cerr << "Error opening file for writing (data export) : " << path << std::endl;
+            std::cerr << "Error opening file for writing (data export) : " << manifest_path << std::endl;
             return;
         }
-        outfile << data->name + " " + type + " " + variant + "}";
+        outfile << path + " " + type + " " + variant + "}";
         outfile.close(); 
+        Paths->append(Trio<std::string>(path, type, variant));
+        res->setId(Paths->len()-1);
+        return Paths->len()-1;
     }
 
 }

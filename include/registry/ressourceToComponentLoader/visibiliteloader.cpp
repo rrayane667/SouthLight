@@ -32,4 +32,21 @@ namespace REG{
 
             loadComponent(reg, entity, j, ress_man);
         }
+
+        json& VisibiliteLoader::exportjson(Registry& reg, int entity) {
+            Visibilite* v = dynamic_cast<Visibilite*>(reg.getComponent<Visibilite>(entity));
+            json j;
+            
+            j["isActive"] = v->isActive;
+            return j;
+        }
+        int VisibiliteLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant) {
+
+            ComponentData* data = new ComponentData;
+            data->component_type = "Visibilite";
+            data->json_component_data = exportjson(reg, entity).dump(4);
+            return ress_man.exportData(data, "component", variant);
+        }
+
+            
 }

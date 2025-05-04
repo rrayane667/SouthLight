@@ -53,7 +53,7 @@ namespace ENGINE {
 
             inline int createEntity(){return Reg.createEntity();}
 
-            void duplicate(int entity, const vec3& v);
+            void duplicate(int entity, const vec3& v); 
 
             inline void addSystem(SYSTEM s){return SysMan.addSystem(s, Reg);}
 

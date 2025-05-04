@@ -23,6 +23,15 @@ namespace RESSOURCES{
         public:
 
             ~Ressource();
+
+            inline std::string getPath() const {return path;}
+            inline std::string getTypeVariant() const {return type_variant;}
+            
+            inline void setPath(const std::string& path_arg) {path = path_arg; }
+            inline void setTypeVariant(const std::string& type_variant_arg) {type_variant = type_variant_arg; }
+            inline void setId(int id_arg) {id = id_arg; }
+
+            std::string exportRessource(const std::string& path_arg) ;
             
             Ressource(const std::string& path, Loader* loadr_arg, int id, const std::string& type_variant);
                 

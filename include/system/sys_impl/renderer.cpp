@@ -15,7 +15,7 @@ namespace SYSTEMS{
 
         
     }   
-    void Renderer::updateCamera(){
+    bool Renderer::updateCamera(){
         float sensitivity = Settings::getInstance()->getSensi();
         for(const auto& keyvalue: entities){
             mat4 view = mat4::view(
@@ -27,10 +27,11 @@ namespace SYSTEMS{
 
             gpu->setUniform(*shadeur, "view", view.list);
         }
+        return true;
     }
 
     void Renderer::onInit(){
-        subscribe(CAMERA_TRANSFORM_UPDATE, Callback([this](Event* event){updateCamera();}));
+        subscribe(CAMERA_TRANSFORM_UPDATE, Callback([this](Event* event){return updateCamera();}));
         //init : load ressource into gpu based on the component/ stores vao into component
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();
@@ -99,7 +100,7 @@ namespace SYSTEMS{
                 for(auto& x: reg.getComponent<Material>(entite->get(0))->tex_components ){
                     
                     
-                    gpu->bindTexture(*x.second, i);
+                    gpu->bindTexture(*x.second.texture, i);
                     gpu->setUniform(*shadeur, x.first, i++);
                     
                 }

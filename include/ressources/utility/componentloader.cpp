@@ -19,4 +19,31 @@ namespace RESSOURCES{
         data.json_component_data = json::parse(inputFile)["data"];
         data.component_type = json::parse(inputFile)["type"];
     }
+
+    std::string ComponentLoader::exportRessource(const std::string& path, Data*& data,const std::string& type_variant) {
+        if (type_variant == "a"){
+           return ComponentLoader::componentExport(path, dynamic_cast<ComponentData&> (*data));
+        }
+    }
+    std::string ComponentLoader::componentExport(const std::string& path, ComponentData& data){
+
+        int i = 0;
+        std::string filename;
+        do {
+            filename = path + "/" + data.name + std::to_string(i++) + ".json";
+        } while (std::filesystem::exists(filename));
+        
+        std::ofstream outputFile(filename);
+        if (!outputFile.good()){
+            std::cerr << "Cannot open file: " << path << '\n';
+            return "";
+        }
+        outputFile << "{\n";
+        outputFile << "  \"type\": \"" << data.component_type << "\",\n";
+        outputFile << "  \"data\": " << data.json_component_data << "\n";
+        outputFile << "}\n";
+        outputFile.close();
+        return path+"/"+data.name +std::to_string(i) +".json";
+    }
+        
 }

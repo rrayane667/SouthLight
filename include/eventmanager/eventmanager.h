@@ -10,8 +10,8 @@
 namespace EVENTS{
 
     struct Callback{
-        std::function<void(Event* event)> func;
-        inline Callback(std::function<void(Event*)> f) : func(std::move(f)) {}
+        std::function<bool (Event* event)> func;
+        inline Callback(std::function<bool (Event*)> f) : func(std::move(f)) {}
         void operator()(Event* event) const {
             if (func) func(event);
         }
