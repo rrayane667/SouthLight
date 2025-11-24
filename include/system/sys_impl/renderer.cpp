@@ -5,7 +5,7 @@ using namespace REG;
 
 namespace SYSTEMS{
     
-    Renderer::Renderer(EventManager& e, REG::Registry& r) : System(e, r) {
+    Renderer::Renderer(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {
         std::cout << std::endl;
         std::cout << "Creating Renderer"<<std::endl;
         
@@ -31,7 +31,7 @@ namespace SYSTEMS{
     }
 
     void Renderer::onInit(){
-        subscribe(CAMERA_TRANSFORM_UPDATE, Callback([this](Event* event){return updateCamera();}));
+        subscribe(CAMERA_TRANSFORM_UPDATE, Callback([this](Event* event){return updateCamera();}, this->getLayer()));
         //init : load ressource into gpu based on the component/ stores vao into component
         //compile shader construct hash table of entities using same shaders
         List<int>* entities_list = reg.getEntities<Mesh>();

@@ -26,60 +26,7 @@ namespace REG{
             virtual json& exportjson(Registry& reg, int entity) = 0;
         };
 
-    class ObjectLoader{
-        private:
-        //map : Component type - ComponentLoader
-            static std::unordered_map<std::string, ComponentLoader*> loaders;
-        public:
-
-        ~ObjectLoader(){
-            for(auto& loader : loaders){
-                delete loader.second;
-            }
-        }
-        inline static void load(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress_man){
-            ComponentData* data = dynamic_cast<ComponentData*>(ress_man.getData(index));
-            std::string component_type = data->component_type;
-            if(loaders.find(component_type) != loaders.end()){
-                
-                loaders[component_type]->loadComponent(reg, entity, json::parse(data->json_component_data),ress_man);
-            }else{
-                std::cerr << "Error: component type not found : " << component_type <<std::endl;
-            }
-        }
-
-        inline static void load(Registry& reg, int entity, json j, RESSOURCES::RessourceManager& ress_man){
-
-
-            if(loaders.find(j["type"]) != loaders.end()){
-                
-                loaders[j["type"]]->loadComponent(reg, entity, j["data"],ress_man);
-            }else{
-                std::cerr << "Error: component type not found : " << j["type"] <<std::endl;
-            }
-        }
-
-        inline static json exportjson(Registry& reg, int entity, std::string type){
-            if(loaders.find(type) != loaders.end()){
-                return loaders[type]->exportjson(reg, entity);
-            }
-            std::cerr << "Error: component type not found : " << type <<std::endl;
-            return json::object();
-            
-        }
-
-        inline static int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string type, std::string variant){
-            if(loaders.find(type) != loaders.end()){
-                return loaders[type]->exportComponent(reg, entity, ress_man, variant);
-            }
-            std::cerr << "Error: component type not found : " << variant <<std::endl;
-            return -1;
-            
-        }
-    };
-
-
-
+    
     class GameobjectLoader : public ComponentLoader{
         void loadComponent(Registry& reg, int entity, RESSOURCES::ComponentData& data, RESSOURCES::RessourceManager& ress_man);
         
@@ -152,7 +99,10 @@ namespace REG{
         
     };
 
-    std::unordered_map<std::string, ComponentLoader*> ObjectLoader::loaders = {
+    class ObjectLoader{
+        private:
+        //map : Component type - ComponentLoader
+            inline static std::unordered_map<std::string, ComponentLoader*> loaders = {
         {"Instances", new InstancesLoader()},
         {"Transform", new TransformLoader()},
         {"Mesh", new MeshLoader()},
@@ -160,6 +110,53 @@ namespace REG{
         {"GameObject", new GameobjectLoader()},
         {"Visibilite", new VisibiliteLoader()},
         };
+        public:
+
+        ~ObjectLoader(){
+            for(auto& loader : loaders){
+                delete loader.second;
+            }
+        }
+        inline static void load(Registry& reg, int entity, int index, RESSOURCES::RessourceManager& ress_man){
+            ComponentData* data = dynamic_cast<ComponentData*>(ress_man.getData(index));
+            std::string component_type = data->component_type;
+            if(loaders.find(component_type) != loaders.end()){
+                
+                loaders[component_type]->loadComponent(reg, entity, json::parse(data->json_component_data),ress_man);
+            }else{
+                std::cerr << "Error: component type not found : " << component_type <<std::endl;
+            }
+        }
+
+        inline static void load(Registry& reg, int entity, json j, RESSOURCES::RessourceManager& ress_man){
+
+
+            if(loaders.find(j["type"]) != loaders.end()){
+                
+                loaders[j["type"]]->loadComponent(reg, entity, j["data"],ress_man);
+            }else{
+                std::cerr << "Error: component type not found : " << j["type"] <<std::endl;
+            }
+        }
+
+        inline static json exportjson(Registry& reg, int entity, std::string type){
+            if(loaders.find(type) != loaders.end()){
+                return loaders[type]->exportjson(reg, entity);
+            }
+            std::cerr << "Error: component type not found : " << type <<std::endl;
+            return json::object();
+            
+        }
+
+        inline static int exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string type, std::string variant){
+            if(loaders.find(type) != loaders.end()){
+                return loaders[type]->exportComponent(reg, entity, ress_man, variant);
+            }
+            std::cerr << "Error: component type not found : " << variant <<std::endl;
+            return -1;
+            
+        }
+    };
     
 
 

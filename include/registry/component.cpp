@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "utilite/dataStruct.h"
+#include "ressources/data.h"
 #include <unordered_map>
 
 
@@ -73,15 +74,16 @@ namespace REG{
     };
 
     struct MaterialArchetype{
-        std::string shader_name;
-        std::unordered_map<std::string, char> expected_input;
-        int frag_index;
-        int vert_index;
+        //n est plus utilisé, remplacé par MaterialArchetypeData
+        //std::string shader_name;
+        //std::unordered_map<std::string, char> expected_input;
+        //int frag_index;
+        //int vert_index;
     };
 
     struct tex_index_ressource{
-        int index;
-        unsigned int* texture;
+        int index; // indice pour ressource image
+        unsigned int* texture;//id pour gpu
     };
 
  
@@ -92,8 +94,8 @@ namespace REG{
         inline Material() : Component(-1) {is_loaded=false;}
 
         unsigned int* shader;
-        MaterialArchetype* archetype;
-        int archetype_index_ressource;
+        RESSOURCES::MaterialArchetypeData* archetype;
+        int archetype_index_ressource = -1;
 
         std::unordered_map<std::string, float> float_components;
         std::unordered_map<std::string, tex_index_ressource> tex_components;

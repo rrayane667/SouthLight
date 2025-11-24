@@ -9,8 +9,8 @@ namespace DATASTRUCT {
 	template <typename T>
 	struct List{
 		
-		virtual T* begin()=0;
-		virtual T* end()=0;
+		virtual T* begin() const =0;
+		virtual T* end() const =0;
 		List(List<T>* l){copy(l);};
 		List() {};
 		virtual ~List() = default;
@@ -55,8 +55,8 @@ namespace DATASTRUCT {
 			DynamicList(List<T>* l){copy(*l);};
 			DynamicList<T>& operator=(const DynamicList<T>& dl);
 
-			inline T* begin() override { return liste; } 
-			inline T* end() override { return liste + current_index + 1; }
+			inline T* begin() const override { return liste; } 
+			inline T* end() const override { return liste + current_index + 1; }
 			void swap(int ind1, int ind2) override;
 			
 			DynamicList();

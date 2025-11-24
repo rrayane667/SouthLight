@@ -16,12 +16,16 @@ namespace REG{
         std::string name = "Entity";
         GameObjectInfo(int entity) : entity_id(entity) {};
         GameObjectInfo(int entity, int ress_id, std::string n) : entity_id(entity), entity_ressource_id(ress_id), name(n) {}
+        friend std::ostream& operator<<(std::ostream& o, const GameObjectInfo& g){
+            o << "Entity id : " << g.entity_id << ", ressource id : " << g.entity_ressource_id << ", name : " << g.name;
+            return o;
+        }
     };
     
     class Registry{
         int total_nbr;
         List<GameObjectInfo> *hierarchy;
-        std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d 
+        std::unordered_map<std::string,SparseSet<Component*>> *compReg;// list s[entity_id] contient index dans d (s et d list du sparseset)
 
         public:
             Registry();
@@ -62,11 +66,11 @@ namespace REG{
 
             friend std::ostream& operator<<(std::ostream& o, const Registry& r){
                 if (!r.hierarchy)
-                    o << "hierarchy is null";
+                    o << "hierarchy is null ";
                 else
-                    o << "hierarchy : " << (*(r.hierarchy)) << std::endl;
+                    o << " hierarchy : " << (*(r.hierarchy)) << std::endl;
                 if (!r.compReg)
-                    o << "compReg is null";
+                    o << "compReg is null ";
                 else {
                     o << "component " << std::endl;
                     for (auto& x : *r.compReg)
@@ -104,6 +108,7 @@ namespace REG{
 
     template <typename T>
     void Registry::addComponent(int entity_id){
+
         if(entity_id >= hierarchy->len()){
             std::cerr << "Error: entity does not exist : " << entity_id << std::endl;
             return;
@@ -118,8 +123,8 @@ namespace REG{
     template <typename T>
     T* Registry::getComponent(int entity_id) const{
         if(compReg->find(T::getComponentId()) == compReg->end()){
-            std::cout << T::getComponentId() << "hada makaynch" << std::endl;
-            throw std::runtime_error("object doesnt have this component");
+            std::cout <<"had entité : "+ std::to_string(entity_id) + "ma3ndhach component : " <<T::getComponentId() << std::endl;
+            throw std::runtime_error("object doesnt have this component" + T::getComponentId() + "(entity id : " + std::to_string(entity_id) +")");
             
             
         }

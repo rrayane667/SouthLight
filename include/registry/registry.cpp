@@ -3,15 +3,16 @@
 namespace REG{
 
     int Registry::createEntity(){
+        int entity_id = hierarchy->len();
         
-        hierarchy->append(GameObjectInfo(hierarchy->len(), -1,"Entity"+std::to_string(hierarchy->len())));
+        hierarchy->append(GameObjectInfo(entity_id, -1,"Entity"+std::to_string(hierarchy->len()+1)));
 
-        addComponent<Visibilite>(hierarchy->len());
-        addComponent<Transform>(hierarchy->len());
+        addComponent<Visibilite>(entity_id);
+        addComponent<Transform>(entity_id);
 
 
         //ajout des component dans les sparse sets correspondants
-        return hierarchy->len();
+        return entity_id;
         
 
     }

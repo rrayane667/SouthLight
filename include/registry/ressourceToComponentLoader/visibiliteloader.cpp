@@ -35,7 +35,7 @@ namespace REG{
 
         json& VisibiliteLoader::exportjson(Registry& reg, int entity) {
             Visibilite* v = dynamic_cast<Visibilite*>(reg.getComponent<Visibilite>(entity));
-            json j;
+            json j = *(new json());
             
             j["isActive"] = v->isActive;
             return j;

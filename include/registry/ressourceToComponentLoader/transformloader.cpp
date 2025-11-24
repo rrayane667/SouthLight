@@ -36,7 +36,7 @@ namespace REG{
 
     json& TransformLoader::exportjson(Registry& reg, int entity) {
         Transform* t = dynamic_cast<Transform*>(reg.getComponent<Transform>(entity));
-        json j;
+        json j = *(new json());
         
         MATH::to_json(j["position"], t->position);
         MATH::to_json(j["rotation"], t->rotation);

@@ -10,10 +10,13 @@
 namespace EVENTS{
 
     struct Callback{
+        int layer;
         std::function<bool (Event* event)> func;
-        inline Callback(std::function<bool (Event*)> f) : func(std::move(f)) {}
-        void operator()(Event* event) const {
-            if (func) func(event);
+        inline Callback(std::function<bool (Event*)> f, int l) : layer(l), func(std::move(f)) {}
+        bool operator()(Event* event) const {
+            if (func) return func(event);
+            std::cout << "Callback function is not set!" << std::endl;
+            return false;
         }
 
         friend std::ostream& operator<<(std::ostream& o, const Callback& f) {

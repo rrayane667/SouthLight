@@ -16,6 +16,7 @@ namespace RESSOURCES{
             return Ressources[ressource_index]->isLoaded();
         } 
 
+        //set different dossier pour chaque nouveau projet
         std::string project_file_path = "C:/Users/ORDI/Desktop/openGL/RessourceDirectory";
 
         SparseSet<Ressource*> Ressources;

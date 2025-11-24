@@ -130,13 +130,13 @@ void Engine::processTextures(){
     for (auto& id : *entities) {
         int i = 0;
         for(auto& keyvalue:(dynamic_cast<Material*> (getComponent<Material>(id))->tex_components )){
+            keyvalue.second.texture = new unsigned int;//gpu texture id
 
-            unsigned int r = *keyvalue.second;
-            TextureData* txt = dynamic_cast<TextureData*>(RessMan.getData(r));
+            TextureData* txt = dynamic_cast<TextureData*>(RessMan.getData(keyvalue.second.index));
 
-            gpu->createTexture(*keyvalue.second, txt->width, txt->height, txt->nrchannels, txt->data);
-            gpu->bindTexture(*keyvalue.second, i++);
-            RessMan.unload(r);
+            gpu->createTexture(*keyvalue.second.texture, txt->width, txt->height, txt->nrchannels, txt->data);
+            gpu->bindTexture(*keyvalue.second.texture, i++);
+            RessMan.unload(keyvalue.second.index);
             
 
         }
@@ -247,9 +247,9 @@ void Engine::processInstances() {
                 RessMan.unload(mat->archetype->frag_index);
 
             }
-            catch(...){
+            catch(std::exception& e){
 
-
+                std::cout << "error while loading material of " << x << ", assigning default material. " << e.what() <<std::endl;
                 Reg.addComponent<Material>(x);
                 if(Reg.hasComponent<Instances>(x)){Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ; std::cout <<"instance ouais ouais"<<std::endl;}
                 
@@ -374,7 +374,7 @@ void Engine::processInstances() {
         
     }
 
-    void Engine::storeMaterialArchetype(MaterialArchetype& material){
+    void Engine::storeMaterialArchetype(MaterialArchetypeData& material){
         json jsonData = nlohmann::json{
             {"shader_name", material.shader_name},
             {"expected_input", material.expected_input},

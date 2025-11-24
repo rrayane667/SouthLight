@@ -22,6 +22,7 @@ namespace RESSOURCES{
     }
     std::string TextureLoader::_jspExport(const std::string& path, TextureData& data){
         // a implementer
+        return "ma implemntetich la fonction export texture teubé lakhor";
     }
 
 

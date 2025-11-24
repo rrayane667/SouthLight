@@ -9,10 +9,11 @@ using namespace DATASTRUCT;
 
 namespace SYSTEMS{
     struct Mappin2d{
-        int x, y;
+        int x, y;// x = quelle layer ?? y = quel systeme dans la layer??
         Mappin2d(int a, int b) {x = a; y = b;}
         Mappin2d(){}
     };
+
     class SystemManager{
         EventManager& em;
 
@@ -22,23 +23,24 @@ namespace SYSTEMS{
         public:
 
             template<typename T, typename... Args>
-            inline void createLayer(T el, Args... args, REG::Registry& r) requires std::is_same_v<T, System*>{
-                systems.append(new Layer(el, args..., r));
+            inline void createLayer(REG::Registry& r, T el, Args... args) requires std::is_same_v<T, System*>{
+                int layer_index = systems.len();
+                systems.append(new Layer(layer_index ,el, args...));
             }
-            inline SystemManager(EventManager& e) : em(e){std::cout << "System manager constructed" << std::endl;std::cout << std::endl;};
+
+            inline SystemManager(EventManager& e) : em(e){systems.append(new Layer(0)); std::cout << "System manager constructed" << std::endl;std::cout << std::endl;};
 
             void addSystem(System* s, int layer_index);
 
 
             // ajoute les systemes a une couche specifique
             template<typename T, typename... Args>
-            inline void addSystem(T s, Args... args,REG::Registry& r, int layer_index) requires std::is_same_v<T, SYSTEM>{
+            inline void addSystem(REG::Registry& r, int layer_index, T s, Args... args) requires std::is_same_v<T, SYSTEM>{
 
 
-                if(!systems.len()) {systems.append(new Layer(s , args..., r, em) );return;}
+                if(!systems.len()) {systems.append(new Layer( r, em, layer_index, s, args...) );return;}
 
-                systems.get(layer_index)->addSystem(s ,r, em);
-                addSystem(args..., r, layer_index);
+                (systems.get(layer_index)->addSystem(args, r, em), ...);
             }
 
             // ajoute un systeme a une couche specifique
@@ -47,15 +49,6 @@ namespace SYSTEMS{
 
             inline System* getSystem(SYSTEM s){ return (systems.get(systems_map[s].x))->get(systems_map[s].y);}
 
-            //ajoute les sytemes a la derniere couche
-            template<typename T, typename... Args>
-            inline void addSystem(T s, Args... args,REG::Registry& r) requires std::is_same_v<T, SYSTEM>{
-
-
-                if(!systems.len()) {systems.append(new Layer(s , args..., r, em) );return;}
-
-                systems.get(systems.len()-1)->addSystem(s, args...,r, em);
-            }
 
             
 

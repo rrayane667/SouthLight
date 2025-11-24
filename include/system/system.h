@@ -25,14 +25,16 @@ namespace SYSTEMS{
         CAMERA_CONTROL,
     } SYSTEM;
     class System{
-
+        int layer;
         
         public:
-            inline System(EventManager& e, REG::Registry& r) : em(e), reg(r) {}
+            inline System(EventManager& e, REG::Registry& r, int l) : em(e), reg(r), layer(l) {}
             virtual void onInit() = 0;
             virtual void onStart() = 0;
             virtual void update() = 0;
             virtual void ondestroy() = 0;
+            int getLayer() const {return layer;}
+            void setLayer(int l) {layer = l;}
 
             virtual SYSTEM getId() = 0;
 
@@ -48,7 +50,7 @@ namespace SYSTEMS{
     };
     class Instanceur : public System{
         public:
-            Instanceur(EventManager& e, REG::Registry& r) : System(e, r) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;subscribe(INSTANCIATION, Callback([this] (Event* event){handleEvent(event);}));}
+            Instanceur(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;subscribe(INSTANCIATION, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
             inline void onInit() override {}
             inline void onStart() override{}
             inline void update() override {}
@@ -75,7 +77,6 @@ namespace SYSTEMS{
                 Transform* t = dynamic_cast<Transform*> (reg.getComponent<Transform>(new_entity));
                 t->position = i->position;
 
-
                 em.publish(new TransformUpdate(new_entity));
                 return true;
             }
@@ -84,7 +85,7 @@ namespace SYSTEMS{
     class Transformer : public System {
    
         public:
-            Transformer(EventManager& e, REG::Registry& r) : System(e, r) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {return updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}));};
+            Transformer(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {return updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}, this->getLayer()));};
             ~Transformer() = default;
         
 
@@ -110,7 +111,7 @@ namespace SYSTEMS{
             Transform* cam_trans;
             public:
 
-            inline Mvt(EventManager& e, REG::Registry& r) : System(e, r){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){return handleEvent(event);}));}
+            inline Mvt(EventManager& e, REG::Registry& r, int l) : System(e, r, l){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
             inline void onInit() override {cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
             inline void onStart() override {}
             inline void update() override{}
@@ -119,7 +120,7 @@ namespace SYSTEMS{
             inline SYSTEM getId() override{return RENDERER;}
             
             inline bool handleEvent(Event* event) {
-                
+
                 KeyPressEvent* keyevent = dynamic_cast<KeyPressEvent*>(event);
                 if (!keyevent) {
                     std::cout << "Received non-key event" << std::endl;
@@ -173,15 +174,15 @@ namespace SYSTEMS{
             float yaw = 0.0f, pitch = 0.0f;
         
         public:
-            CameraController(EventManager& e, REG::Registry& r) : System(e,r) {
-                subscribe(MOUSE_MOVE, Callback([this](Event* e) { return handleMouse(e); }));
+            CameraController(EventManager& e, REG::Registry& r, int l) : System(e, r, l){
+                subscribe(MOUSE_MOVE, Callback([this](Event* e) { return handleMouse(e); }, this->getLayer()));
                 std::cout << "Camera control setup" << std::endl;
             }
         
             bool handleMouse(Event* event) {
                 
                 auto* mouseEvent = dynamic_cast<const MouseMoveEvent*>(event);
-                if (!mouseEvent) return;
+                if (!mouseEvent) return false;
         
                 yaw += static_cast<float>(mouseEvent->xPos) ;
                 pitch -= static_cast<float>(mouseEvent->yPos) ;
@@ -210,7 +211,7 @@ namespace SYSTEMS{
             GraphicsDevice* gpu;
         
         public:
-            inline InputReading(EventManager& e, REG::Registry& r) : System(e, r) { 
+            inline InputReading(EventManager& e, REG::Registry& r, int l) : System(e, r, l) { 
                 std::cout << "Input System Initialized" << std::endl;
                 gpu = GraphicsDevice::getInstance();
             }
@@ -238,7 +239,7 @@ namespace SYSTEMS{
         Transform* camTrans;
         public:
 
-            Renderer(EventManager& e, REG::Registry& r);
+            Renderer(EventManager& e, REG::Registry& r, int l);
             ~Renderer() = default;
 
 

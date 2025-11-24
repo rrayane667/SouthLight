@@ -99,7 +99,7 @@ namespace RESSOURCES{
     }
 
     int RessourceManager::exportData(Data* data, std::string type, std::string variant){
-        if (data == nullptr){std::cerr << "Cannot export data, nullptr provided" << std::endl; return;}
+        if (data == nullptr){std::cerr << "Cannot export data, nullptr provided" << std::endl; return -1;}
         Ressource* res = (Factories[variant]->*FactoriesFunc[variant][type])("", -1);
         std::string path = res->exportRessource(project_file_path + "/" + type);
         res->setPath(path);
@@ -107,7 +107,7 @@ namespace RESSOURCES{
         std::ofstream outfile(manifest_path, std::ios_base::app);
         if (!outfile.is_open()) {
             std::cerr << "Error opening file for writing (data export) : " << manifest_path << std::endl;
-            return;
+            return -1;
         }
         outfile << path + " " + type + " " + variant + "}";
         outfile.close(); 

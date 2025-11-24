@@ -41,9 +41,9 @@ namespace RESSOURCES{
         std::ofstream outputFile(filename);
         if (!outputFile.good()){
             std::cerr << "Cannot open file: " << path << '\n';
-            return;
+            return "makayn matexporté sir tn3s 0 gameobject";
         }
-        std::ofstream outputFile(filename);
+
         outputFile << data.json_game_object_data;
         outputFile.close();
         return path+"/"+data.name +std::to_string(i) +".json";

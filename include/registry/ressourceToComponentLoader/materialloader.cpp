@@ -28,19 +28,20 @@ namespace REG{
             int material_archetype_index = j["mat_archetype_index"];
             mat->archetype_index_ressource = material_archetype_index;
 
-            MaterialArchetype* mat_archetype = dynamic_cast<MaterialArchetype*>(ress_man.getData(material_archetype_index));
+            MaterialArchetypeData* mat_archetype_data = dynamic_cast<MaterialArchetypeData*>(ress_man.getData(material_archetype_index));
 
-            const char* vert = (dynamic_cast<RESSOURCES::ShaderData*> (ress_man.getData(mat->archetype->vert_index)))->shaderString;
-            const char* frag = (dynamic_cast<RESSOURCES::ShaderData*> (ress_man.getData(mat->archetype->frag_index)))->shaderString;
+
+            const char* vert = (dynamic_cast<RESSOURCES::ShaderData*> (ress_man.getData(mat_archetype_data->vert_index)))->shaderString;
+            const char* frag = (dynamic_cast<RESSOURCES::ShaderData*> (ress_man.getData(mat_archetype_data->frag_index)))->shaderString;
 
             mat->shader = new unsigned int;
             gpu->createShader(mat->shader, vert, frag);
             mat->is_loaded = true;
-            ress_man.unload(mat->archetype->vert_index);
-            ress_man.unload(mat->archetype->frag_index);
-            mat->archetype = mat_archetype;
+            ress_man.unload(mat_archetype_data->vert_index);
+            ress_man.unload(mat_archetype_data->frag_index);
+            mat->archetype = mat_archetype_data;
             int i =0;
-            for(auto& x: mat_archetype->expected_input){
+            for(auto& x: mat_archetype_data->expected_input){
                 if(x.second == '0'){
                     mat->tex_components[x.first].texture = new unsigned int();
                     mat->tex_components[x.first].index = j[x.first];
@@ -67,7 +68,7 @@ namespace REG{
         }
 
         json& MaterialLoader::exportjson(Registry& reg, int entity){
-            json j;
+            json j = *(new json());
             Material* mat = dynamic_cast<Material*>(reg.getComponent<Material>(entity));
             j["mat_archetype_index"] = mat->archetype_index_ressource;
             for(auto& x: mat->tex_components){

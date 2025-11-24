@@ -14,8 +14,11 @@ namespace SYSTEMS{
 
    void SystemManager::addSystem(SYSTEM s, REG::Registry& r, int layer_index){
         if(systems_map.find(s) != systems_map.end()) return;
+        
         (systems.get(layer_index))->addSystem(s, r, em);
+
         systems_map[s] = Mappin2d(layer_index, (systems.get(layer_index))->getSize()-1);
+        
     } 
 
 

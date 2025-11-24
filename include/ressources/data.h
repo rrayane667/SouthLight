@@ -78,7 +78,7 @@ namespace RESSOURCES
             return td;
         }
         std::string shader_name;
-        std::unordered_map<std::string, char> expected_input;
+        std::unordered_map<std::string, char> expected_input; // char : '0' = texture, char : '1' = float
         int frag_index;
         int vert_index;
 
@@ -117,6 +117,10 @@ namespace RESSOURCES
             return td;
         }
         List<int>* gameobjects;
+        friend std::ostream& operator<<(std::ostream& o, const SceneData& s){
+            o << "Scene data - Gameobjects : " << *(s.gameobjects);
+            return o;
+        }
     };
 
 
