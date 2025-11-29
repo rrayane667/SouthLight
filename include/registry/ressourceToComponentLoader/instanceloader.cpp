@@ -31,14 +31,14 @@ namespace REG{
         void InstancesLoader::loadComponent(Registry& reg, int entity,  json j, RESSOURCES::RessourceManager& ress_man){
             reg.addComponent<Instances>(entity);
             Instances* instances = dynamic_cast<Instances*>(reg.getComponent<Instances>(entity));
-            DATASTRUCT::from_json(j["instances"], *instances->instances);
+            DATASTRUCT::from_json(j["instances"], instances->instances);
         }
 
         json& InstancesLoader::exportjson(Registry& reg, int entity){
             json j;
 
             Instances* instances = dynamic_cast<Instances*>(reg.getComponent<Instances>(entity));
-            DATASTRUCT::to_json(j["instances"], *instances->instances);
+            DATASTRUCT::to_json(j["instances"], instances->instances);
             return j;
         }
         int InstancesLoader::exportComponent(Registry& reg, int entity, RESSOURCES::RessourceManager& ress_man, std::string variant){

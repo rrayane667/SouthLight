@@ -5,7 +5,7 @@ using namespace REG;
 
 namespace SYSTEMS{
     
-    Renderer::Renderer(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {
+    Renderer::Renderer(int l) : System(l) {
         std::cout << std::endl;
         std::cout << "Creating Renderer"<<std::endl;
         
@@ -51,7 +51,7 @@ namespace SYSTEMS{
             entities[*shadeur]->append(x);
         }
         
-
+        ALLOC::BasePool<DynamicList<int>>::dealloc(dynamic_cast<DynamicList<int>*>(entities_list) );
         
     }
 
@@ -106,7 +106,7 @@ namespace SYSTEMS{
                 }
                 
 
-                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances->len() );
+                if(reg.hasComponent<Instances>(x)) gpu->drawInstanced(reg.getComponent<Mesh>(x)->vertex_count, reg.getComponent<Instances>(x)->instances.len() );
                 else{
                     
                     gpu->setUniform(*shadeur, "model", (reg.getComponent<Transform>(x)->model).list);

@@ -43,6 +43,16 @@ namespace DATASTRUCT{
 	}
 
 	template <typename T>
+	void DynamicList<T>::clear(){
+		if(isEmpty()) return;
+
+		for(int i =0; i <= current_index; ++i){
+			(liste + i)->~T();
+		}
+		current_index = -1;
+	}
+
+	template <typename T>
 	DynamicList<T>& DynamicList<T>::operator=(const DynamicList<T>& dl){
 		if(dl.liste==(*this).liste){return *this;}
 		if constexpr (std::is_pointer_v<T>) {
@@ -70,6 +80,7 @@ namespace DATASTRUCT{
 
 	template <typename T>
 	DynamicList<T>::~DynamicList() {
+		if(current_index == -1){return;}
 		if constexpr (std::is_pointer_v<T>) {
             
             for (int i = 0; i <= current_index; i++) {
@@ -142,12 +153,13 @@ namespace DATASTRUCT{
 
 	template <typename T>
 	void DynamicList<T>::remove(int index) {
-		
+		if(isEmpty()) return;
 		if (index > (current_index)) {
 			return;
 		}
 		
 		if (index == (current_index)) {
+			(liste + current_index)->~T();
 			current_index--;
 			return;
 		}

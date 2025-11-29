@@ -24,13 +24,17 @@ namespace REG{
     };
 
     struct Instances : public Component{
-        unsigned int instanceBuffer; //contains transform info
-        List<int>* instances;
-        inline Instances(int index) : Component(index) {instances = new DynamicList<int>;}
+        unsigned int instanceBuffer; //contains transform info dans gpu
+        DynamicList<int> instances;
+        float* instance_models;
+        inline Instances(int index) : Component(index) {}
         inline void aff(std::ostream& o) override{
-            o<<"Instances : "<< *instances<<std::endl;
+            o<<"Instances : "<< instances<<std::endl;
         }
         static inline std::string getComponentId(){return "Instances";}
+        inline ~Instances(){
+            delete[] instance_models;
+        }
     };
 
     struct Visibilite : public Component{

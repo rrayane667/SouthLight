@@ -6,6 +6,7 @@
 #include "eventmanager/eventmanager.h"
 #include <algorithm>
 #include "settings/settings.cpp"
+#include "customheapallocators/baseallocator.h"
 
 using namespace EVENTS;
 using namespace REG;
@@ -28,7 +29,7 @@ namespace SYSTEMS{
         int layer;
         
         public:
-            inline System(EventManager& e, REG::Registry& r, int l) : em(e), reg(r), layer(l) {}
+            System(int l) ;
             virtual void onInit() = 0;
             virtual void onStart() = 0;
             virtual void update() = 0;
@@ -50,20 +51,25 @@ namespace SYSTEMS{
     };
     class Instanceur : public System{
         public:
-            Instanceur(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;subscribe(INSTANCIATION, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
+            Instanceur(int l) : System(l) {std::cout << "INSTANCIATION INSTANCEE"<<std::endl;subscribe(INSTANCIATION, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
             inline void onInit() override {}
             inline void onStart() override{}
             inline void update() override {}
             inline void ondestroy() override {}
             inline SYSTEM getId() {return INSTANCEUR;}
 
-            inline int instance( int entity){
+            inline int instance( int entity, const vec3& pos){
                 reg.addComponent<Instances>(entity);
                 
                 Instances* inst = dynamic_cast<Instances*> (reg.getComponent<Instances>(entity));
-                if (!inst->instances->len()) inst->instances->append(entity);
+                if (!inst->instances.len()) inst->instances.append(entity);
                 int e = reg.createEntity();
-                inst->instances->append(e);
+                inst->instances.append(e);
+                int i = 0;
+                for(auto& x:mat4::translation(pos).list){
+                    inst->instance_models[inst->instances.len()*16 -16 + i++] = x;
+
+                }
                 return e;
 
             }
@@ -72,12 +78,12 @@ namespace SYSTEMS{
 
                 
                 Instanciation* i = dynamic_cast<Instanciation*>(event);
-                int new_entity = instance(i->entity);
+                int new_entity = instance(i->entity, i->position);
 
                 Transform* t = dynamic_cast<Transform*> (reg.getComponent<Transform>(new_entity));
                 t->position = i->position;
 
-                em.publish(new TransformUpdate(new_entity));
+                em.publish( ALLOC::BaseStack::alloc<TransformUpdate>(new_entity) );
                 return true;
             }
     };
@@ -85,7 +91,7 @@ namespace SYSTEMS{
     class Transformer : public System {
    
         public:
-            Transformer(EventManager& e, REG::Registry& r, int l) : System(e, r, l) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {return updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}, this->getLayer()));};
+            Transformer(int l) : System(l) {std::cout<<"TRANSFORMER TRANSFORMANT"<<std::endl;subscribe(TRANSFORM_UPDATE,Callback([this] (Event* event) {return updateMatrix( (dynamic_cast<TransformUpdate*> (event))->x );}, this->getLayer()));};
             ~Transformer() = default;
         
 
@@ -111,7 +117,7 @@ namespace SYSTEMS{
             Transform* cam_trans;
             public:
 
-            inline Mvt(EventManager& e, REG::Registry& r, int l) : System(e, r, l){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
+            inline Mvt(int l) : System(l){std::cout << "mvt howa hadak" << std::endl;subscribe(KEYBOARD_INPUT, Callback([this] (Event* event){return handleEvent(event);}, this->getLayer()));}
             inline void onInit() override {cam_trans =reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0));};
             inline void onStart() override {}
             inline void update() override{}
@@ -161,7 +167,7 @@ namespace SYSTEMS{
                 }
             
                 if (keyevent->key >= 65 && keyevent->key <= 90) {
-                    publish(new CameraTransformUpdate());
+                    publish(ALLOC::BaseStack::alloc<CameraTransformUpdate>());
                     return true;
                 }
                 return false;
@@ -174,7 +180,7 @@ namespace SYSTEMS{
             float yaw = 0.0f, pitch = 0.0f;
         
         public:
-            CameraController(EventManager& e, REG::Registry& r, int l) : System(e, r, l){
+            CameraController(int l) : System(l){
                 subscribe(MOUSE_MOVE, Callback([this](Event* e) { return handleMouse(e); }, this->getLayer()));
                 std::cout << "Camera control setup" << std::endl;
             }
@@ -195,7 +201,7 @@ namespace SYSTEMS{
         
 
                 reg.getComponent<Transform>(reg.getEntities<Camera>()->get(0) )->rotation = vec3(pitch, yaw, 0); 
-                CameraTransformUpdate* c = new CameraTransformUpdate();
+                CameraTransformUpdate* c = ALLOC::BaseStack::alloc<CameraTransformUpdate>();
                 publish(c);
                 return true;
 
@@ -211,7 +217,7 @@ namespace SYSTEMS{
             GraphicsDevice* gpu;
         
         public:
-            inline InputReading(EventManager& e, REG::Registry& r, int l) : System(e, r, l) { 
+            inline InputReading(int l) : System(l) { 
                 std::cout << "Input System Initialized" << std::endl;
                 gpu = GraphicsDevice::getInstance();
             }
@@ -239,7 +245,7 @@ namespace SYSTEMS{
         Transform* camTrans;
         public:
 
-            Renderer(EventManager& e, REG::Registry& r, int l);
+            Renderer(int l);
             ~Renderer() = default;
 
 

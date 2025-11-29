@@ -1,5 +1,5 @@
 #include "eventmanager/eventmanager.h"
-
+#include "customheapallocators/baseallocator.h"
 
 namespace EVENTS{
     void EventManager::subscribe(EventType type, Callback c) {
@@ -26,10 +26,11 @@ namespace EVENTS{
     }
 
     void EventManager::processEvents(){
-        
-        while(event_stack.len()){
+        int i = 0;
+        while(i < event_stack.len()){
 
-            Event* event = event_stack[0];
+            Event* event = event_stack[i];
+            
             auto it = subscribers.find(event->type);
             if (it != subscribers.end()) {
                 
@@ -40,7 +41,13 @@ namespace EVENTS{
                 }
             }
             else{std::cout << "Event mal9inahch"<<std::endl;}
-            event_stack.remove(0);
+            i++;
         }
+
+        event_stack.releaseOwnership();
+
+        ALLOC::BaseStack::deallocate();
+
+
     }
 }

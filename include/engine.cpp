@@ -8,7 +8,7 @@
 #include <cstring>
 #include "json/json.hpp"
 #include <fstream>
-
+#include "subservicemanager/subservicemanager.h"
 using namespace REG;
 using json = nlohmann::json;
 
@@ -16,10 +16,10 @@ using json = nlohmann::json;
 namespace ENGINE{
     
 
-    Engine::Engine(RENDERER_TYPE type) : EvMan(), SysMan(EvMan), Reg(), RessMan() {
-        std::cout << "CStarting Engine..." << std::endl;
-        s = Settings::getInstance();
-        s->setRenderer(type);
+    Engine::Engine(RENDERER_TYPE type) : EvMan(SUBSERVICES::SubServiceManager::getEventManager()), SysMan(SUBSERVICES::SubServiceManager::getSystemManager()), Reg(SUBSERVICES::SubServiceManager::getRegistry()), RessMan(SUBSERVICES::SubServiceManager::getRessourceManager()) {
+       std::cout << "CStarting Engine..." << std::endl;
+       s = Settings::getInstance();
+       s->setRenderer(type);
        gpu =  GraphicsDevice::getInstance();
        std::cout << "Engine khdam" << std::endl;
        std::cout << std::endl;
@@ -142,6 +142,7 @@ void Engine::processTextures(){
         }
 
     }
+    ALLOC::BasePool<DynamicList<int>>::dealloc(dynamic_cast<DynamicList<int>*>(entities) );
 
 }
 
@@ -152,21 +153,13 @@ void Engine::processInstances() {
         
         Instances* inst = Reg.getComponent<Instances>(id);
         Mesh* mesh = Reg.getComponent<Mesh>(id);
-        float* buffer = new float[16 * inst->instances->len() ];
-        float* copy = buffer;
-
-
-        for (auto& x : *(inst->instances)) { 
-            std::memcpy(copy, Reg.getComponent<Transform>(x)->model.list, 16*sizeof(float));
-            copy += 16;
-
-        }
+        
 
 
 
         gpu->bindVertexArray(mesh->vao);
-        gpu->createVertexBuffer(inst->instanceBuffer, buffer, 16 * inst->instances->len() * sizeof(float));
-        delete[] buffer; 
+        gpu->createVertexBuffer(inst->instanceBuffer, inst->instance_models, 16 * inst->instances.len() * sizeof(float));
+
 
 
         gpu->structBuffer(2, 4, 16, 0);
@@ -179,6 +172,7 @@ void Engine::processInstances() {
         gpu->instanceDiviseur(4, 1);
         gpu->instanceDiviseur(5, 1);
     }
+    ALLOC::BasePool<DynamicList<int>>::dealloc(dynamic_cast<DynamicList<int>*>(entities) );
 }
     
 
@@ -223,7 +217,7 @@ void Engine::processInstances() {
 
         }
         
-        delete entities;
+        ALLOC::BasePool<DynamicList<int>>::dealloc(dynamic_cast<DynamicList<int>*>(entities) );
     }
 
     void Engine::processMaterials(){
@@ -249,7 +243,7 @@ void Engine::processInstances() {
             }
             catch(std::exception& e){
 
-                std::cout << "error while loading material of " << x << ", assigning default material. " << e.what() <<std::endl;
+                std::cout << "error while loading material of " << x << ", assigning default material. error : " << e.what() <<std::endl;
                 Reg.addComponent<Material>(x);
                 if(Reg.hasComponent<Instances>(x)){Reg.getComponent<Material>(x)->shader = Settings::getDefaultShaderInstanced() ; std::cout <<"instance ouais ouais"<<std::endl;}
                 
@@ -260,7 +254,7 @@ void Engine::processInstances() {
 
 
         }
-        delete entities_list;
+        ALLOC::BasePool<DynamicList<int>>::dealloc(dynamic_cast<DynamicList<int>*>(entities_list) );
     }
 
 
@@ -331,6 +325,52 @@ void Engine::processInstances() {
         
         EvMan.publish(new Instanciation(entity, v));
         EvMan.processEvents();
+
+    }
+
+    void Engine::duplicate(const int& entity, const List<vec3>& positions){
+        Reg.addComponent<Instances>(entity);
+                
+        Instances* inst = dynamic_cast<Instances*> (Reg.getComponent<Instances>(entity));
+        if (!inst->instances.len()) inst->instances.append(entity);
+        
+        inst->instance_models = new float[positions.len()*16];
+        int i =0;
+        for (auto& pos : positions) {
+            int new_obj = Reg.createEntity();
+            inst->instances.append(new_obj);
+            Transform* t = dynamic_cast<Transform*> (Reg.getComponent<Transform>(new_obj));
+            t->position = pos;
+            mat4 model = mat4::translation(pos)*mat4::rotation(vec4(0,0,1,0),t->rotation.z)*mat4::rotation(vec4(0,1,0,0),t->rotation.y)*mat4::rotation(vec4(1,0,0,0),t->rotation.x)*mat4::scale(t->scale);
+            t->model = model;
+            for(auto& x:model.list){
+                inst->instance_models[i] = x;
+                i++;
+            }
+
+        }
+
+    }
+
+    void Engine::createStaticDuplicateGroup(int entity, const List<vec3>& positions){
+        Reg.addComponent<Instances>(entity);
+        Transform* t = dynamic_cast<Transform*> (Reg.getComponent<Transform>(entity));
+        Instances* inst = dynamic_cast<Instances*> (Reg.getComponent<Instances>(entity));
+        if (!inst->instances.len()) inst->instances.append(entity);
+         //-1 indicates static instance group
+        inst->instance_models = new float[positions.len()*16];
+        int i =0;
+        
+        for (auto& pos : positions) {
+            mat4 model = mat4::translation(pos)*mat4::rotation(vec4(0,0,1,0),t->rotation.z)*mat4::rotation(vec4(0,1,0,0),t->rotation.y)*mat4::rotation(vec4(1,0,0,0),t->rotation.x)*mat4::scale(t->scale);
+
+            inst->instances.append(-1);// tkhrbi9 khas itbdl
+            for(auto& x:model.list){
+                inst->instance_models[i] = x;
+                i++;
+            }
+
+        }
 
     }
 

@@ -1,5 +1,5 @@
 #include "gpu/gl/gl_gpu.h"
-
+#include "customheapallocators/baseallocator.h"
 #include<iostream>
 #include "settings/settings.cpp"
 
@@ -23,7 +23,7 @@ namespace GPU{
 
         if (xPos != lastX || yPos != lastY) {
 
-            EVENTS::MouseMoveEvent* mouseEvent = new EVENTS::MouseMoveEvent(-(xPos - lastX), -(yPos - lastY)); 
+            EVENTS::MouseMoveEvent* mouseEvent = ALLOC::BaseStack::alloc<EVENTS::MouseMoveEvent>(-(xPos - lastX), -(yPos - lastY)); 
             em.publish(mouseEvent);
     
             lastX = xPos;
@@ -38,7 +38,7 @@ namespace GPU{
         for (int key = GLFW_KEY_SPACE; key <= GLFW_KEY_LAST; key++) {  // Loop through keys
             if (glfwGetKey(glfwWindow, key) == GLFW_PRESS) {
                 
-                EVENTS::KeyPressEvent* keyEvent = new EVENTS::KeyPressEvent(key);
+                EVENTS::KeyPressEvent* keyEvent = ALLOC::BaseStack::alloc<EVENTS::KeyPressEvent>(key) ;
                 em.publish(keyEvent);
                 
             }
@@ -84,7 +84,7 @@ namespace GPU{
     }
 
     void GL_GraphicsDevice::createVertexBuffer(unsigned int& vbo, const void* data, size_t size){
-        
+        // faut checker si vbo est deja utilisé ?
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
 

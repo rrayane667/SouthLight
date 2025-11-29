@@ -14,7 +14,7 @@ namespace EVENTS{
         INSTANCIATION,
     }EventType;
 
-    struct Event{
+    struct Event{//EVENTS MUST BE PODS OR TRIVIALLY DESTRUCTIBLE IN ORDER TO USE THE STACK ALLOCATOR (SINON MEMORY LEAK)
         EventType type;
         
         virtual ~Event() {};

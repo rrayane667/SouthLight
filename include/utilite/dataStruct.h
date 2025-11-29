@@ -18,12 +18,13 @@ namespace DATASTRUCT {
 		virtual void remove(int index) = 0;
 		virtual void insert(int index, T& el) = 0;
 		virtual int capacity() = 0;
-		virtual int len() = 0;
+		virtual int len() const = 0;
 		virtual T pop() = 0;
 		virtual T& get(int index) = 0;
 		virtual T& operator[](int index) = 0;
 		virtual void aff(std::ostream& where) const= 0;
 		virtual void reserve(int new_maximun_size) = 0;
+		virtual void clear() = 0;
 
 		List<T>& operator=( List<T>& l) {return *copy(l);}
 
@@ -50,7 +51,9 @@ namespace DATASTRUCT {
 
 		public:
 			
-			
+			inline void releaseOwnership() {
+        		current_index = -1; // C'est la liste qui se modifie elle-même
+    		}
 			DynamicList(DynamicList<T>* l){copy(*l);};
 			DynamicList(List<T>* l){copy(*l);};
 			DynamicList<T>& operator=(const DynamicList<T>& dl);
@@ -61,12 +64,13 @@ namespace DATASTRUCT {
 			
 			DynamicList();
 			~DynamicList() override;
+			void clear() override;
 			void append(const T& el) override;
 			void remove(int index) override;
 			void insert(int index, T& el) override;
 			int capacity() override{return max_size;}
 			void reserve(int new_maximun_size) override;
-			inline int len() override{return current_index+1;}
+			inline int len() const override{return current_index+1;}
 			T pop() override;
 			
 			inline T& operator[](int index) override{//checker si index existe????

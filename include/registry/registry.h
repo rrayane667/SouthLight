@@ -4,6 +4,7 @@
 #include "registry/component.cpp"
 #include <unordered_map>
 #include <string>
+#include "customheapallocators/baseallocator.h"
 
 using namespace DATASTRUCT;
 
@@ -93,7 +94,7 @@ namespace REG{
             return nullptr;
         }
 
-        List<int>* l = new DynamicList<int>;
+        List<int>* l = ALLOC::BasePool<DynamicList<int>>::alloc();
 
 
         SparseSet<Component *>& ss = (*compReg)[T::getComponentId()];
@@ -117,7 +118,7 @@ namespace REG{
             (*compReg)[T::getComponentId()] = SparseSet<Component*>();
         }
         if((*compReg)[T::getComponentId()].getIndex(entity_id) !=-1) return;
-        (*compReg)[T::getComponentId()].set(entity_id,new T(total_nbr++));
+        (*compReg)[T::getComponentId()].set(entity_id,ALLOC::BasePool<T>::alloc(total_nbr++) );
     }
 
     template <typename T>

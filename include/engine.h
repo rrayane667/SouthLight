@@ -20,10 +20,10 @@ namespace ENGINE {
     
 
     class Engine {
-        SystemManager SysMan;
+        SystemManager& SysMan;
         
         
-        RessourceManager RessMan;
+        RessourceManager& RessMan;
         GraphicsDevice* gpu;// handles communication with gpu
         //SceneManager scene_manager;
 
@@ -38,8 +38,8 @@ namespace ENGINE {
         void freeProcessedMesh(ProcessedMesh* mesh);
 
         public:
-        Registry Reg;
-            EventManager EvMan;
+        Registry& Reg;
+            EventManager& EvMan;
             void onInit();
             void onUpdate();
             Engine(RENDERER_TYPE type);
@@ -55,7 +55,14 @@ namespace ENGINE {
 
             inline int createEntity(){return Reg.createEntity();}
 
+            //ajoute une seul copie d'une entité (dans registry et gpu)
             void duplicate(int entity, const vec3& v); 
+
+            //ajoute des instances statiques (dans registry et gpu)
+            void duplicate(const int& entity, const List<vec3>& positions);// n utilise pas event manager
+
+            //ajoute instances statiques fantomes (inexistant dans registry present uniquement dans le gpu)
+            void createStaticDuplicateGroup(int entity, const List<vec3>& positions);// n utilise pas event manager
 
             inline void addSystem(SYSTEM s, int layer_index){return SysMan.addSystem(s, Reg, layer_index);}
 
